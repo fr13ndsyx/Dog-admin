@@ -1,0 +1,16 @@
+
+#foreach ($enum in $enumList)
+
+/**
+ * $enum.columnComment
+ */
+export const $enum.upperUnderscoreEnum = {
+
+}
+#end
+
+export default {
+#foreach ($enum in $enumList)
+    $enum.upperUnderscoreEnum,
+#end
+};

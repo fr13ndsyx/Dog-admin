@@ -1,0 +1,38 @@
+export const appDefaultConfig = {
+  // i18n 语言选择
+  language: 'zh_CN',
+  layout: 'side',
+  // 侧边菜单宽度 ， 默认为200px
+  sideMenuWidth: 200,
+  //标签页位置
+  pageTagLocation: 'center',
+  // 夜间模式
+  darkModeFlag: false,
+  // 菜单主题
+  sideMenuTheme: 'dark',
+  // 主题颜色索引
+  colorIndex: 0,
+  // 顶部菜单页面宽度
+  pageWidth: '99%',
+  // 圆角
+  borderRadius: 6,
+  // 菜单展开模式
+  menuSingleExpandFlag: true,
+  // 标签页
+  pageTagFlag: true,
+  pageTagStyle: 'chrome',
+  // 面包屑
+  breadCrumbFlag: true,
+  // 帮助文档
+  helpDocFlag: true,
+  // 帮助文档默认展开
+  helpDocExpandFlag: false,
+  // 水印
+  watermarkFlag: true,
+  // 网站名称
+  websiteName: 'dogadmin',
+  // 主题颜色
+  primaryColor: '#1677ff',
+  // 紧凑
+  compactFlag: false,
+};

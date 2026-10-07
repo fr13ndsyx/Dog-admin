@@ -1,0 +1,38 @@
+<template>
+  <a-modal :open="visible" width="620px" :footer="null" :bodyStyle="{ height: '420px' }" title="" :closable="false" :maskClosable="true">
+    <a-alert style="width: 550px" message="根据《网络安全法》和《数据安全法》要求，需要定期修改密码保障数据安全！" type="warning" show-icon />
+    <Password @on-success="refresh" />
+  </a-modal>
+</template>
+<script setup lang="ts">
+  import { computed } from 'vue';
+  import Password from '/@/views/system/account/components/password/index.vue';
+  import { useUserStore } from '/@/store/modules/system/user';
+  import { loginApi } from '/@/api/system/login-api';
+  import { dogSentry } from '/@/lib/dog-sentry';
+  import { DogLoading } from '/@/components/framework/dog-loading/index';
+
+  /**
+   * 修改密码弹窗
+   */
+  const visible = computed(() => {
+    return useUserStore().$state.needUpdatePwdFlag;
+  });
+
+  /**
+   * 刷新
+   */
+  async function refresh() {
+    try {
+      DogLoading.show();
+      //获取登录用户信息
+      const res = await loginApi.getLoginInfo();
+      //更新用户信息到pinia
+      useUserStore().setUserLoginInfo(res.data);
+    } catch (e) {
+      dogSentry.captureError(e);
+    } finally {
+      DogLoading.hide();
+    }
+  }
+</script>

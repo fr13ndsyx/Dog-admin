@@ -1,0 +1,260 @@
+# dogadmin 管理后台底座
+
+基于 Vue 3 与 Spring Boot 3 的前后端分离管理后台，保留账号、组织、角色权限和必要支撑功能，适合在此基础上开发自己的业务系统。
+
+界面以电脑端为主，最小布局宽度为 1200px；窄窗口使用横向滚动。
+
+## 1. 当前功能
+
+| 模块 | 功能 |
+| --- | --- |
+| 登录与安全 | 登录、验证码、登录失败锁定、密码复杂度和定期改密配置 |
+| 首页 | 欢迎信息、日期、有效登录地区、语录、天气展示、帮助文档和更新日志 |
+| 组织管理 | 员工、部门、一级部门和下级部门 |
+| 权限管理 | 角色、角色员工关联、菜单，以及按钮和后端接口权限 |
+| 个人中心 | 个人资料、修改密码、头像 |
+| 文档中心 | 帮助文档目录与内容管理、文档查阅、意见反馈、更新日志、Swagger |
+| 基础支撑 | 文件上传、字典底层、表格列配置、邮件模板、代码生成 |
+| 安全审计 | 登录与退出日志、操作日志、三级等保设置 |
+
+标签页支持右键关闭其他或关闭所有。首页天气仅展示，依赖第三方天气服务；登录地区没有有效地理信息时不显示。
+
+初始化不带业务示例、历史文档和测试人员。字典、文件和配置等保留底层能力，不代表都有独立管理页面。
+
+## 2. 技术栈与环境
+
+| 部分 | 技术或要求 |
+| --- | --- |
+| 前端 | Vue 3.5.43、TypeScript 5.6.3、Vite 5.2.12、Ant Design Vue 4.2.5、Pinia |
+| 前端工具 | Node.js >= 18，建议使用仍受维护的 LTS 版本；npm |
+| 后端 | Java 17、Spring Boot 3.5.4、MyBatis-Plus 3.5.12、Sa-Token 1.44.0 |
+| 后端工具 | JDK 17 或兼容版本，建议 Maven 3.9.x；可使用 IntelliJ IDEA |
+| 数据库 | MySQL 8.x |
+| 缓存和会话 | Redis；建议使用独立实例或独立逻辑数据库 |
+
+首次安装需要访问 npm 和 Maven 仓库。前端按 `package-lock.json` 安装依赖，后端按父工程 `pom.xml` 管理依赖。
+
+## 3. 源码与压缩包
+
+本文描述改名后的当前源码。名称调整没有重新生成之前的压缩包；转交最新版本时，应从当前源码重新打包。
+
+当前源码目录与压缩包目录对应如下：
+
+| 内容 | 原源码目录 | 解压后目录 |
+| --- | --- | --- |
+| 前端 | `admin-web-typescript/` | `web/` |
+| 后端父工程 | `admin-api-java17-springboot3/` | `api/` |
+| 初始化 SQL | `mysql/admin.sql` | `api/mysql/admin.sql` |
+
+解压两个包后，主要结构为：
+
+```text
+web/
+├── public/
+├── src/
+├── tests/
+├── .env.localhost
+├── package.json
+├── package-lock.json
+└── vite.config.ts
+
+api/
+├── dog-admin/
+│   ├── src/main/java/
+│   ├── src/main/resources/
+│   └── pom.xml
+├── dog-base/
+│   ├── src/main/java/
+│   ├── src/main/resources/
+│   └── pom.xml
+├── mysql/admin.sql
+└── pom.xml
+```
+
+`dog-admin` 是启动模块，`dog-base` 是它依赖的公共模块。打开后端时导入父工程 `api/pom.xml`。
+
+两个压缩包是源码包，不包含 `node_modules/`、`dist/`、`target/`、运行日志、上传运行数据、IDE 配置和本机私有连接信息。本 README 单独提供，不放入压缩包。
+
+## 4. 初始化数据库
+
+1. 启动 MySQL，使用数据库管理工具新建一个空数据库，建议名称为 `dogadmin`。
+2. 字符集选择 `utf8mb4`，排序规则选择 `utf8mb4_general_ci`。
+3. 选中这个新库，执行 `api/mysql/admin.sql`；原源码使用 `mysql/admin.sql`。
+4. 核对导入结果，再配置后端连接这个数据库。
+
+创建数据库也可以使用：
+
+```sql
+CREATE DATABASE dogadmin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+```
+
+初始化 SQL 在当前选中的数据库执行，不固定数据库名称，不包含删除已有库表的语句。它用于全新安装，不是旧数据库的升级脚本，不要在已有业务数据的库上重复导入。
+
+初始化结果：
+
+- 23 张表。
+- 1 个管理员账号、1 个默认部门、1 个管理员角色及员工角色关联。
+- 50 项菜单和功能点，以及对应的 50 条管理员菜单授权。
+- 1 项必要安全配置、1 份登录验证码邮件模板。
+- 其余 15 张表为空，登录和操作后会正常产生新的日志。
+
+登录账号为 `admin` 初始密码：`123456`。
+
+管理员 UID 与密码摘要是配对数据，不能只修改其中一个字段来重置密码。
+
+## 5. 配置并启动后端
+
+### 5.1 环境配置
+
+压缩包中的 `dev`、`test`、`pre`、`prod` 配置使用环境变量提供连接信息。默认 Maven profile 为 `dev`。
+
+主要配置文件：
+
+- `api/dog-admin/src/main/resources/dev/application.yaml`：应用端口、环境、日志目录。
+- `api/dog-base/src/main/resources/dev/dog-base.yaml`：数据库、Redis、邮件、文件存储和安全支撑配置。
+
+原源码中的本机 `dev/test` 配置与压缩包的公共模板不同，不直接转交本机私有配置。使用原源码的公共配置时，可选择已有的 `pre` Maven profile。
+
+| 环境变量 | 默认值 | 用途 |
+| --- | --- | --- |
+| `MYSQL_HOST` | `127.0.0.1` | MySQL 地址 |
+| `MYSQL_PORT` | `3306` | MySQL 端口 |
+| `MYSQL_DATABASE` | `dogadmin` | 导入 SQL 的数据库名称 |
+| `MYSQL_USER` | `root` | MySQL 账号 |
+| `MYSQL_PASSWORD` | 无，必须设置 | MySQL 密码，与 admin 登录密码是两回事 |
+| `REDIS_HOST` | `127.0.0.1` | Redis 地址 |
+| `REDIS_PORT` | `6379` | Redis 端口 |
+| `REDIS_DATABASE` | `1` | Redis 逻辑数据库，需与其他项目隔离 |
+| `REDIS_PASSWORD` | 空 | Redis 有密码时设置 |
+
+在 IDEA 的 `AdminApplication` 运行配置中设置这些环境变量，并让该进程能连接 MySQL 和 Redis。使用终端启动时，环境变量必须在该终端进程中生效。
+
+### 5.2 IDEA 启动
+
+1. 打开 `api/pom.xml`，作为 Maven 父工程导入。
+2. 将项目与 Maven 使用的 JDK 设置为 17 或兼容版本。
+3. 重新加载 Maven 工程，等待依赖下载完成；默认选择 `dev` profile。
+4. 设置运行环境变量，工作目录建议选择 `api/`。
+5. 运行启动类 `net.dogadmin.admin.AdminApplication`。
+
+启动类文件位于 `api/dog-admin/src/main/java/net/dogadmin/admin/AdminApplication.java`。Maven 会按选择的 profile 处理 YAML 资源；切换 profile 后重新处理资源，不能仅修改 Spring 的运行参数代替 Maven profile 切换。
+
+后端默认地址为 `http://127.0.0.1:1024`，Swagger 地址为 `http://127.0.0.1:1024/swagger-ui/index.html`。
+
+### 5.3 命令行启动（可选）
+
+在 `api/` 目录中执行以下命令，环境变量仍需提前设置：
+
+```shell
+mvn -Pdev -DskipTests clean package
+java -jar dog-admin/target/dog-admin-dev-3.0.0.jar
+```
+
+这组命令会下载依赖并编译后端。开发阶段优先使用 IDE；本 README 的编写没有执行这些命令。
+
+### 5.4 按需配置
+
+- 邮件验证码：设置 `MAIL_HOST`、`MAIL_PORT`、`MAIL_USERNAME`、`MAIL_PASSWORD`，并验证邮件投递后再开启双因子登录。初始化配置关闭邮件双因子，首次登录不需要 SMTP。
+- 文件存储：默认使用本地存储，上传目录由 `UPLOAD_DIRECTORY` 控制，默认 `./runtime/upload/`；文件访问前缀通过 `FILE_URL_PREFIX` 配置。
+- 日志：通过 `LOG_DIRECTORY` 配置日志根目录，默认 `./runtime/logs`。
+- 云存储：切换存储模式后配置 `CLOUD_REGION`、`CLOUD_ENDPOINT`、`CLOUD_BUCKET`、`CLOUD_ACCESS_KEY`、`CLOUD_SECRET_KEY` 等变量。
+
+## 6. 安装并启动前端
+
+在 `web/` 目录打开终端：
+
+```shell
+npm ci
+npm run localhost
+```
+
+默认访问地址为 `http://127.0.0.1:8081`。端口被占用时，以 Vite 终端输出的实际地址为准。
+
+本地接口地址在 `web/.env.localhost` 中配置：
+
+```dotenv
+NODE_ENV=development
+VITE_APP_TITLE='dogadmin'
+VITE_APP_API_URL='http://127.0.0.1:1024'
+```
+
+后端地址或端口变化时同步修改 `VITE_APP_API_URL`，然后重启 Vite。此变量是浏览器可见的接口地址，不能放入服务密码或密钥。
+
+已有的前端脚本：
+
+| 命令 | 作用 |
+| --- | --- |
+| `npm run localhost` | 使用 `.env.localhost` 启动开发服务 |
+| `npm run dev` | 使用 development 模式启动开发服务 |
+| `npm run build:test` | 测试构建，资源基础路径为 `/admin/` |
+| `npm run build:pre` | 预发布构建 |
+| `npm run build:prod` | 生产构建 |
+
+构建输出在 `dist/`；需要构建时先确认对应环境的接口地址。
+
+## 7. 首次运行检查
+
+1. 确认 MySQL、Redis 和后端已启动，再启动前端。
+2. 使用 `admin` 和交付方提供的密码登录。
+3. 首页应显示语录、天气区域、帮助文档和更新日志卡片；初始化后文档和更新日志显示空状态是正常的。
+4. 员工、部门和角色列表应各有一条基础数据；菜单管理应有 50 项菜单和功能点。
+5. 标签页右键应能关闭其他或关闭所有；天气区域点击不跳转。
+6. 再次登录和进行管理操作后，可到登录日志、操作日志页面检查新记录。
+7. 新增业务和普通角色后，分别核对页面、按钮与后端接口权限；前端按钮隐藏不能代替后端鉴权。
+
+## 8. 常见问题
+
+| 现象 | 检查方向 |
+| --- | --- |
+| 启动提示无法解析 `MYSQL_PASSWORD` | 检查运行进程是否设置此环境变量；不能只在另一个终端里设置 |
+| 数据库连接失败或找不到表 | 检查 MySQL 连接参数、数据库名及 SQL 是否导入到同一个库 |
+| Redis 连接失败 | 检查地址、端口、密码和逻辑数据库配置 |
+| 前端打不开或接口请求失败 | 查看 Vite 实际端口，核对 `.env.localhost` 中的接口地址和后端是否启动 |
+| 登录提示密码错误 | 确认取得交付方当前密码，初始化 SQL 没有设置其他统一默认密码 |
+| 新库出现旧部门或旧会话 | 检查是否复用了其他项目的 Redis 数据库，改用独立实例或数据库 |
+| 首页文档、更新日志为空 | 初始化不带历史内容，可到文档中心创建 |
+| 天气没有加载 | 检查第三方天气服务及网络连接；其他后台功能不依赖天气服务 |
+
+## 9. 验证范围
+
+已完成初始化 SQL 的 MySQL 导入核对、表结构与基础数据检查、管理员密码摘要配对和权限关联检查，以及两个源码压缩包的逐项完整性核验。
+
+本次文档编写没有重新构建或启动整套项目。接收者需要按第 7 节在自己的环境完成运行检查；邮件投递、云存储和公网部署需要按实际配置验证。
+
+现有源码仍有尚未整理的严格 TypeScript 类型检查问题。`build:*` 使用 Vite 构建，不等于全仓类型检查已经通过。
+
+## IP 地区数据
+
+后端公共模块的 `dog-base/src/main/resources/ip2region.xdb` 是离线 IP 地区查询数据，由启动监听器加载到内存，供登录和操作日志记录地区使用。它不是 MySQL 初始化脚本，项目改名不修改该文件。
+
+当前源码采用 `net.dogadmin` 包名前缀，Maven 模块为 `dog-admin` 和 `dog-base`；公共配置文件为 `dog-base.yaml`，默认数据库名为 `dogadmin`。已有数据库名称不变时，可通过 `MYSQL_DATABASE` 指定原名称。
+
+本轮项目改名已通过离线 Maven 模型校验和 5 项源码回归检查，包括 Java 包路径、Mapper 引用、配置加载、品牌与旧缓存、桌面首页、头像和登录动画；没有执行 Maven 编译、Vite 构建或整套应用启动。可运行检查位于 `admin-web-typescript/tests/test_project_identity.cjs`，安装前端依赖后在前端目录执行 `npm exec -- node tests/test_project_identity.cjs`。
+
+## 自定义代码前缀与传输加密
+
+项目自定义工具类、组件、文件名、导出符号、CSS和生成模板现使用 `Dog`/`dog` 前缀，例如 `DogBeanUtil.java`、`dog-sentry.ts`、`dog-loading/`。引用与调用同步修改，第三方库名称不变。
+
+前后端AES及SM4传输参数已同步更新，均保持16字节；数据库中的管理员密码摘要和初始化SQL没有修改。前后端必须使用同一版代码，旧后端配合新前端会导致加解密失败。更新后由使用者重新编译、启动后端，并重启或刷新前端，再检查真实登录。
+
+源码检查已验证密钥配对、中文与对象往返加解密、标准密文格式以及文件和类引用；当前没有运行完整Java服务或重新验证实际登录，没有执行构建。
+
+## 版权与许可
+
+本项目（dogadmin 管理后台底座）基于 **SmartAdmin** 二次开发。
+
+| 项 | 说明 |
+| --- | --- |
+| 原项目 | SmartAdmin |
+| 原项目仓库 | https://github.com/1024-lab/smart-admin |
+| 原项目官网 | https://smartadmin.vip |
+| 版权归属 | 1024 创新实验室（中国·洛阳） |
+| 开源协议 | MIT License |
+| 原版权声明 | `Copyright (c) 2020 1024-lab` |
+
+SmartAdmin 采用 MIT License 发布，允许免费任意商用。本项目沿用同一协议，完整许可文本见仓库根目录的 `LICENSE` 文件。按照 MIT License 的要求，原项目的版权声明与许可声明已完整保留，未作删改。
+
+本项目对代码的名称调整、结构调整和功能裁剪均属二次开发，不影响原作者对原作品的版权归属。名称调整只涉及本项目自身的标识（包名、Maven 模块名、组件与工具类前缀等），不改变第三方依赖的名称，也不代表原项目立场，不构成原作者对本项目的认可或背书。
+
+`LICENSE` 文件中的版权声明指向原作品作者。若需在对外发布时同时声明二次开发部分的版权，应在 `LICENSE` 中原版权行下方另起一行追加，不要替换或删除原有版权行。
+

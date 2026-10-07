@@ -1,0 +1,117 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:dogadmin}?autoReconnect=true&useServerPreparedStmts=false&rewriteBatchedStatements=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    initial-size: 2
+    min-idle: 2
+    max-active: 10
+    max-wait: 60000
+    time-between-eviction-runs-millis: 60000
+    min-evictable-idle-time-millis: 300000
+    filters: stat
+  data:
+    redis:
+      database: ${REDIS_DATABASE:1}
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 10000ms
+      lettuce:
+        pool:
+          max-active: 5
+          min-idle: 1
+          max-idle: 3
+          max-wait: 30000ms
+  mail:
+    host: ${MAIL_HOST:smtp.163.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    test-connection: false
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            socketFactory:
+              class: com.sun.mail.util.MailSSLSocketFactory
+              fallback: false
+        debug: false
+  jackson:
+    serialization:
+      write-enums-using-to-string: true
+      write-dates-as-timestamps: false
+    deserialization:
+      read-enums-using-to-string: true
+      fail-on-unknown-properties: false
+    default-property-inclusion: always
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 10MB
+  cache:
+    type: redis
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  health:
+    mail:
+      enabled: false
+server:
+  tomcat:
+    basedir: ${project.log-directory}/tomcat-logs
+    accesslog:
+      enabled: true
+      max-days: 7
+      pattern: "%t %{X-Forwarded-For}i %a %r %s (%D ms) %I (%B byte)"
+file:
+  storage:
+    mode: local
+    local:
+      upload-path: ${UPLOAD_DIRECTORY:./runtime/upload/}
+      url-prefix: ${FILE_URL_PREFIX:}
+    cloud:
+      region: ${CLOUD_REGION:}
+      endpoint: ${CLOUD_ENDPOINT:}
+      bucket-name: ${CLOUD_BUCKET:}
+      access-key: ${CLOUD_ACCESS_KEY:}
+      secret-key: ${CLOUD_SECRET_KEY:}
+      private-url-expire-seconds: 3600
+      public-url-prefix: ${CLOUD_PUBLIC_URL_PREFIX:}
+springdoc:
+  swagger-ui:
+    enabled: true
+    doc-expansion: none
+    tags-sorter: alpha
+    server-base-url:
+  api-docs:
+    enabled: true
+http:
+  pool:
+    max-total: 20
+    connect-timeout: 50000
+    read-timeout: 50000
+    write-timeout: 50000
+    keep-alive: 300000
+access-control-allow-origin: '*'
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 2592000
+  active-timeout: -1
+  is-concurrent: false
+  is-share: false
+  token-style: simple-uuid
+  auto-renew: true
+  is-log: true
+  log-level: debug
+  is-print: false
+  is-read-cookie: false
+

@@ -1,0 +1,22 @@
+# ===== 构建产物 =====
+target/
+node_modules/
+dist/
+dist-ssr/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.iml
+
+# ===== 日志与运行数据 =====
+*.log
+**/runtime/
+
+# ===== 系统文件 =====
+.DS_Store
+Thumbs.db
+
+# ===== 本机私有覆盖（.env.* 模板文件保留提交）=====
+.env.local
+.env.*.local

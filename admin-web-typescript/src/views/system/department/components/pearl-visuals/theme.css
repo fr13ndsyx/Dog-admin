@@ -1,0 +1,122 @@
+/* 珍珠玻璃局部令牌：不改 :root、body、宿主页面的按钮或布局。 */
+.pg-visual {
+  font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", -apple-system, BlinkMacSystemFont, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  font-synthesis: none;
+  color: var(--pg-ink);
+  line-height: 1.5;
+  --pg-ink: #101418;
+  --pg-ink-muted: #596368;
+  --pg-ink-soft: #7e888c;
+  --pg-ink-faint: #99a2a5;
+  --pg-blue: #236de9;
+  --pg-blue-soft: rgba(35, 109, 233, .1);
+  --pg-lime: #82dd2d;
+  --pg-focus: rgba(35, 109, 233, .8);
+  --pg-r-xs: 8px;
+  --pg-r-md: 16px;
+  --pg-r-lg: 20px;
+  --pg-r-xl: 24px;
+  --pg-shade: 46, 58, 62;
+  --pg-line-strong: rgba(var(--pg-shade), .11);
+  --pg-glass-line: rgba(255, 255, 255, .88);
+  --pg-e1: 0 1px 2px rgba(var(--pg-shade), .05), 0 5px 14px rgba(var(--pg-shade), .04);
+  --pg-e2: 0 1px 3px rgba(var(--pg-shade), .06), 0 12px 30px rgba(var(--pg-shade), .055);
+  --pg-e3: 0 2px 6px rgba(var(--pg-shade), .07), 0 22px 50px rgba(var(--pg-shade), .08);
+  --pg-edge: inset 0 1px 0 rgba(255, 255, 255, .92);
+  --pg-edge-strong: inset 0 1px 0 rgba(255, 255, 255, .98);
+  --pg-float-bg: rgba(246, 248, 247, .86);
+  --pg-float-inset: inset 0 0 0 1px rgba(120, 132, 135, .13), inset 0 1px 0 rgba(255, 255, 255, .72);
+  --pg-surface: linear-gradient(145deg, rgba(255, 255, 255, .97), rgba(249, 252, 251, .93));
+  --pg-surface-solid: #fbfcfc;
+  --pg-hover-bg: rgba(var(--pg-shade), .045);
+  --pg-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --pg-track-eyebrow: .14em;
+  --pg-plate-bg: rgba(21, 24, 26, .9);
+  --pg-plate-line: rgba(255, 255, 255, .1);
+  --pg-plate-ink: #f2f5f4;
+  --pg-plate-soft: rgba(255, 255, 255, .56);
+  --pg-cat-1-bg: #f6e7c4;
+  --pg-cat-1-ink: #7a5a16;
+  --pg-cat-2-bg: #d7e7fb;
+  --pg-cat-2-ink: #275a96;
+  --pg-cat-3-bg: #e4dcf7;
+  --pg-cat-3-ink: #5b4597;
+  --pg-cat-4-bg: #f7dce1;
+  --pg-cat-4-ink: #94384c;
+  --pg-cat-5-bg: #d8f0dc;
+  --pg-cat-5-ink: #2d7140;
+  --pg-ambient-a: rgba(130, 221, 45, .07);
+  --pg-ambient-b: rgba(35, 109, 233, .055);
+  --pg-pulse-halo: rgba(35, 109, 233, .18);
+  --pg-ease-premium: cubic-bezier(.16, 1, .3, 1);
+}
+.pg-visual[data-theme="dark"] {
+  --pg-ink: #eef2f1;
+  --pg-ink-muted: #b0babd;
+  --pg-ink-soft: #8d979a;
+  --pg-ink-faint: #6c7679;
+  --pg-blue: #4c8dff;
+  --pg-blue-soft: rgba(76, 141, 255, .16);
+  --pg-focus: rgba(76, 141, 255, .85);
+  --pg-shade: 0, 0, 0;
+  --pg-line-strong: rgba(255, 255, 255, .1);
+  --pg-glass-line: rgba(255, 255, 255, .1);
+  --pg-e1: 0 1px 2px rgba(0, 0, 0, .3), 0 5px 14px rgba(0, 0, 0, .2);
+  --pg-e2: 0 1px 3px rgba(0, 0, 0, .32), 0 12px 30px rgba(0, 0, 0, .28);
+  --pg-e3: 0 2px 6px rgba(0, 0, 0, .36), 0 22px 50px rgba(0, 0, 0, .42);
+  --pg-edge: inset 0 1px 0 rgba(255, 255, 255, .06);
+  --pg-edge-strong: inset 0 1px 0 rgba(255, 255, 255, .09);
+  --pg-float-bg: rgba(30, 34, 37, .9);
+  --pg-float-inset: inset 0 0 0 1px rgba(255, 255, 255, .04), inset 0 1px 0 rgba(255, 255, 255, .06);
+  --pg-surface: linear-gradient(145deg, rgba(29, 33, 36, .98), rgba(25, 29, 31, .96));
+  --pg-surface-solid: #1b1f21;
+  --pg-hover-bg: rgba(255, 255, 255, .05);
+  --pg-plate-bg: rgba(8, 10, 11, .78);
+  --pg-cat-1-bg: rgba(232, 190, 96, .16);
+  --pg-cat-1-ink: #ecc779;
+  --pg-cat-2-bg: rgba(100, 160, 240, .16);
+  --pg-cat-2-ink: #92bdf5;
+  --pg-cat-3-bg: rgba(160, 132, 236, .17);
+  --pg-cat-3-ink: #bfaaf4;
+  --pg-cat-4-bg: rgba(236, 120, 140, .16);
+  --pg-cat-4-ink: #f2a3b1;
+  --pg-cat-5-bg: rgba(110, 200, 130, .15);
+  --pg-cat-5-ink: #94dca6;
+  --pg-ambient-a: rgba(130, 221, 45, .05);
+  --pg-ambient-b: rgba(76, 141, 255, .07);
+  --pg-pulse-halo: rgba(76, 141, 255, .28);
+}
+.pg-visual, .pg-visual *, .pg-visual *::before, .pg-visual *::after { box-sizing: border-box; }
+.pg-visual .pg-tnum { font-variant-numeric: tabular-nums; }
+.pg-visual button { font: inherit; }
+.pg-visual .pg-float {
+  border: 1px solid var(--pg-glass-line);
+  background: var(--pg-float-bg);
+  box-shadow: var(--pg-e3), var(--pg-float-inset);
+  backdrop-filter: blur(28px) saturate(1.08);
+  -webkit-backdrop-filter: blur(28px) saturate(1.08);
+}
+.pg-visual .pg-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--pg-ink-faint);
+  white-space: nowrap;
+}
+.pg-visual .pg-org-card { display: flex; flex-direction: column; gap: 6px; width: 280px; max-width: 100%; padding: 14px 16px; border-radius: var(--pg-r-lg); }
+.pg-visual .pg-org-card-title { font-size: 18px; font-weight: 720; letter-spacing: -.02em; }
+.pg-visual .pg-org-card-rows { margin: 6px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; font-size: 12.5px; }
+.pg-visual .pg-org-card-rows dt { color: var(--pg-ink-faint); }
+.pg-visual .pg-org-card-rows dd { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-visual .pg-org-members { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.pg-visual .pg-org-members li { display: grid; grid-template-columns: 26px minmax(0, auto) minmax(0, 1fr); align-items: center; gap: 9px; font-size: 12.5px; }
+.pg-visual .pg-org-members li.faint { display: block; }
+.pg-visual .pg-org-actions { flex-direction: row; flex-wrap: wrap; width: auto; }
+
+.pg-visual .pg-org-card-title { margin: 0; }
+@media (prefers-reduced-transparency: reduce) {
+  .pg-visual .pg-float { backdrop-filter: none; -webkit-backdrop-filter: none; background: var(--pg-surface-solid); }
+}

@@ -16,6 +16,7 @@ import net.dogadmin.base.common.annoation.NoNeedLogin;
 import net.dogadmin.base.common.constant.RequestHeaderConst;
 import net.dogadmin.base.common.domain.ResponseDTO;
 import net.dogadmin.base.common.util.DogRequestUtil;
+import net.dogadmin.base.module.support.apiencrypt.service.ApiEncryptService;
 import net.dogadmin.base.module.support.captcha.domain.CaptchaVO;
 import net.dogadmin.base.module.support.securityprotect.service.Level3ProtectConfigService;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,9 @@ public class LoginController {
 
     @Resource
     private Level3ProtectConfigService level3ProtectConfigService;
+
+    @Resource
+    private ApiEncryptService apiEncryptService;
 
     @NoNeedLogin
     @PostMapping("/login")
@@ -52,6 +56,13 @@ public class LoginController {
     @GetMapping("/login/logout")
     public ResponseDTO<String> logout() {
         return loginService.logout(DogRequestUtil.getRequestUser());
+    }
+
+    @Operation(summary = "获取密码加密公钥")
+    @GetMapping("/login/getEncryptPublicKey")
+    @NoNeedLogin
+    public ResponseDTO<String> getEncryptPublicKey() {
+        return ResponseDTO.ok(apiEncryptService.getPublicKey());
     }
 
     @Operation(summary = "获取验证码")

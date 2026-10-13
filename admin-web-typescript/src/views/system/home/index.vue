@@ -16,11 +16,13 @@
           scrolling="no"
           src="https://i.tianqi.com/index.php?c=code&id=12&icon=1&num=3&site=12"
         ></iframe>
+        <a-button class="feedback-button" type="link" @click="feedbackModal?.show()"><MessageOutlined /> 意见反馈</a-button>
       </div>
     </div>
   </a-card>
+  <FeedbackModal ref="feedbackModal" />
   <HomeHelpDoc />
-  <a-card class="change-log-card" title="更新日志" :bordered="false">
+  <a-card v-if="loadFailed || changeLogs.length" class="change-log-card" title="更新日志" :bordered="false">
     <template #extra>
       <a-button type="link" :loading="loading" @click="queryChangeLogs">刷新</a-button>
     </template>
@@ -49,6 +51,7 @@
   import { changeLogApi } from '/@/api/support/change-log-api';
   import { dogSentry } from '/@/lib/dog-sentry';
   import HomeHelpDoc from '/@/layout/components/side-help-doc/index.vue';
+  import FeedbackModal from '/@/layout/components/side-help-doc/components/feedback-modal.vue';
   import heartSentences from './heart-sentence';
   import ChangeLogModal from '../../support/change-log/change-log-modal.vue';
 
@@ -69,6 +72,7 @@
   const heartSentence = heartSentences[Math.floor(Math.random() * heartSentences.length)];
   const changeLogs = ref<ChangeLog[]>([]);
   const changeLogModal = ref<InstanceType<typeof ChangeLogModal>>();
+  const feedbackModal = ref<InstanceType<typeof FeedbackModal>>();
   const loading = ref(false);
   const loadFailed = ref(false);
 
@@ -112,6 +116,7 @@
   .heart-sentence { margin-top: 14px; line-height: 1.8; }
   .weather { width: 400px; flex-shrink: 0; }
   .weather iframe { display: block; border: 0; pointer-events: none; }
+  .feedback-button { display: block; margin-left: auto; padding-right: 0; }
   .version-button { height: auto; padding: 0; font-weight: 600; }
   .publish-date { margin-left: 16px; color: #999; font-size: 13px; }
   .change-log-preview {

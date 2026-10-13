@@ -2,8 +2,6 @@ import { message, Modal } from 'ant-design-vue';
 import axios from 'axios';
 import { localRead } from '/@/utils/local-util';
 import { useUserStore } from '/@/store/modules/system/user';
-import { decryptData, encryptData } from './encrypt';
-import { DATA_TYPE_ENUM } from '../constants/common-const';
 import _ from 'lodash';
 import LocalStorageKeyConst from '/@/constants/local-storage-key-const';
 
@@ -54,15 +52,6 @@ dogAxios.interceptors.response.use(
     // 如果是json数据
     if (response.data && response.data instanceof Blob) {
       return Promise.reject(response.data);
-    }
-
-    // 如果是加密数据
-    if (response.data.dataType === DATA_TYPE_ENUM.ENCRYPT.value) {
-      response.data.encryptData = response.data.data;
-      let decryptStr = decryptData(response.data.data);
-      if (decryptStr) {
-        response.data.data = JSON.parse(decryptStr);
-      }
     }
 
     const res = response.data;
@@ -140,19 +129,6 @@ export const request = (config) => {
 export const postRequest = (url, data) => {
   return request({
     data,
-    url,
-    method: 'post',
-  });
-};
-
-// ================================= 加密 =================================
-
-/**
- * 加密请求参数的post请求
- */
-export const postEncryptRequest = (url, data) => {
-  return request({
-    data: { encryptData: encryptData(data) },
     url,
     method: 'post',
   });

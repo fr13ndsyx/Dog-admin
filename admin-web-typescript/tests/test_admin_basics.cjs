@@ -37,6 +37,7 @@ async function main() {
     { departmentId: 3, parentId: 2, departmentName: '产品部' },
   ];
   let shown;
+  const memberRequests = new Map();
   const sentryErrors = [];
   const support = {
     '/@/lib/dog-sentry': { dogSentry: { captureError: error => sentryErrors.push(error) } },
@@ -49,6 +50,11 @@ async function main() {
     'ant-design-vue': { Modal: {} },
     '@ant-design/icons-vue': { ExclamationCircleOutlined: {} },
     './components/department-form-modal.vue': {},
+    './components/pearl-visuals/OrgCanvas.vue': {},
+    '/@/api/system/employee-api': { employeeApi: {
+      queryAll: async () => ({ data: [] }),
+      queryEmployeeByDeptId: departmentId => new Promise(resolve => memberRequests.set(departmentId, resolve)),
+    } },
   });
   const department = list.setup;
   department.departmentFormModal.value = { showModal: data => { shown = data; } };
@@ -61,6 +67,21 @@ async function main() {
   assert.equal(department.departmentTreeData.value[1].children[0].departmentId, 3);
   assert.equal(department.departmentTreeData.value[0].children, undefined);
   assert.deepEqual(Array.from(department.defaultExpandedRowList.value), [1, 2]);
+  department.memberCountByDepartmentId.value = { 3: 2 };
+  const orgRoots = department.orgTree.value;
+  assert.deepEqual(Array.from(orgRoots, node => node.id), [1, 2]);
+  assert.equal(orgRoots[0].memberCount, 0);
+  assert.equal(orgRoots[1].children[0].name, '产品部');
+  assert.equal(orgRoots[1].children[0].memberCount, 2);
+  const staleSelection = department.selectOrgNode(orgRoots[0]);
+  const latestSelection = department.selectOrgNode(orgRoots[1]);
+  memberRequests.get(2)({ data: [{ employeeId: 5, actualName: '成员甲', disabledFlag: false }] });
+  await latestSelection;
+  memberRequests.get(1)({ data: [{ employeeId: 6, actualName: '成员乙', disabledFlag: false }] });
+  await staleSelection;
+  assert.equal(department.selectedOrgNode.value.id, 2);
+  assert.deepEqual(Array.from(department.selectedMembers.value, member => member.employeeId), [5]);
+  assert.equal(department.membersLoading.value, false);
   department.keywords.value = '产品';
   department.onSearch();
   assert.equal(department.departmentTreeData.value.length, 1);
@@ -104,6 +125,7 @@ async function main() {
     '/@/lib/dog-sentry': support['/@/lib/dog-sentry'],
     '../../support/change-log/change-log-modal.vue': {},
     '/@/layout/components/side-help-doc/index.vue': {},
+    '/@/layout/components/side-help-doc/components/feedback-modal.vue': {},
     './heart-sentence': { default: ['原来的语录'] },
   });
   const initial = home.mounted[0]();
@@ -151,6 +173,8 @@ async function main() {
   assert.match(home.descriptor.styles[0].content, /pointer-events: none/);
   assert.match(home.descriptor.template.content, /title="当地天气"/);
   assert.match(home.descriptor.template.content, /<HomeHelpDoc/);
+  assert.match(home.descriptor.template.content, /feedbackModal\?\.show\(\)/);
+  assert.match(home.descriptor.template.content, /v-if="loadFailed \|\| changeLogs\.length"/);
 
   let documentRequests = 0;
   let finishDocuments;
@@ -161,7 +185,6 @@ async function main() {
       return documentFailure ? Promise.reject(Error('documents network')) : new Promise(resolve => { finishDocuments = resolve; });
     } } },
     '/@/lib/dog-sentry': support['/@/lib/dog-sentry'],
-    './components/feedback-modal.vue': {},
   });
   const initialDocuments = documents.mounted[0]();
   await documents.activated[0]();
@@ -185,7 +208,8 @@ async function main() {
   assert.equal(documents.setup.helpDocs.value[0].helpDocId, 8);
   assert.equal(sentryErrors.length, 2);
   assert.match(documents.descriptor.template.content, /helpDocId: item.helpDocId/);
-  assert.match(documents.descriptor.template.content, /feedbackModal\?\.show\(\)/);
+  assert.doesNotMatch(documents.descriptor.template.content, /feedbackModal/);
+  assert.match(documents.descriptor.template.content, /v-if="loadFailed \|\| helpDocs\.length"/);
   assert.doesNotMatch(fs.readFileSync(path.join(root, 'src/layout/side-layout.vue'), 'utf8'), /SideHelpDoc|help-doc-sider|helpDocExpandFlag/);
   assert.doesNotMatch(fs.readFileSync(path.join(root, 'src/layout/components/header-user-space/index.vue'), 'utf8'), /showHelpDoc|helpDocExpandFlag/);
   const loginFile = 'src/views/system/login3/login.vue';

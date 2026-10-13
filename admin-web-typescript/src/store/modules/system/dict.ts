@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { DICT_SPLIT } from '/@/constants/support/dict-const';
 import _ from 'lodash';
 import { dictApi } from '/@/api/support/dict-api';
-import { dogSentry } from '/@/lib/dog-sentry';
+import { sentry } from '/@/lib/sentry';
 
 export const useDictStore = defineStore({
   id: 'dict',
@@ -87,7 +87,7 @@ export const useDictStore = defineStore({
         const dictRes = await dictApi.getAllDictData();
         this.initData(dictRes.data);
       }catch (e){
-        dogSentry.captureError(e);
+        sentry.captureError(e);
       }
     },
     // 初始化字典

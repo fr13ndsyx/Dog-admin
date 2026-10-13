@@ -1,4 +1,4 @@
-import defaultAvatar from '/@/assets/images/wechat-icon.png';
+import defaultAvatar from '/@/assets/images/default-avatar.svg';
 
 export { defaultAvatar };
 

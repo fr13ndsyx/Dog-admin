@@ -23,5 +23,5 @@ export function calcTableHeight(heightRef, removeRefArray, extraRemoveHeight) {
   }
 
   removeHeight = removeHeight + extraRemoveHeight + due;
-  heightRef.value = document.querySelector('#dogadminLayoutContent').offsetHeight - removeHeight;
+  heightRef.value = document.querySelector('#adminLayoutContent').offsetHeight - removeHeight;
 }

@@ -1,15 +1,15 @@
 <template>
-  <a-form class="dog-query-form" v-privilege="'support:helpDoc:query'">
-    <a-row class="dog-query-form-row">
-      <a-form-item label="关键字" class="dog-query-form-item">
+  <a-form class="query-form" v-privilege="'support:helpDoc:query'">
+    <a-row class="query-form-row">
+      <a-form-item label="关键字" class="query-form-item">
         <a-input style="width: 300px" v-model:value="queryForm.keywords" placeholder="标题、作者" />
       </a-form-item>
 
-      <a-form-item label="创建时间" class="dog-query-form-item">
+      <a-form-item label="创建时间" class="query-form-item">
         <a-range-picker :presets="defaultTimeRanges" v-model:value="createDate" @change="createDateChange" style="width: 220px" />
       </a-form-item>
 
-      <a-form-item class="dog-query-form-item dog-margin-left10">
+      <a-form-item class="query-form-item margin-left10">
         <a-button-group>
           <a-button type="primary" @click="onSearch">
             <template #icon>
@@ -29,8 +29,8 @@
   </a-form>
 
   <a-card size="small" :bordered="false">
-    <a-row class="dog-table-btn-block">
-      <div class="dog-table-operate-block">
+    <a-row class="table-btn-block">
+      <div class="table-operate-block">
         <a-button type="primary" @click="addOrUpdate()" v-privilege="'support:helpDoc:add'">
           <template #icon>
             <PlusOutlined />
@@ -38,7 +38,7 @@
           新建
         </a-button>
       </div>
-      <div class="dog-table-setting-block">
+      <div class="table-setting-block">
         <TableOperator v-model="tableColumns" :tableId="TABLE_ID_CONST.SUPPORT.HELP_DOC" :refresh="queryHelpDocList" />
       </div>
     </a-row>
@@ -60,7 +60,7 @@
           }}</router-link>
         </template>
         <template v-else-if="column.dataIndex === 'action'">
-          <div class="dog-table-operate">
+          <div class="table-operate">
             <a-button type="link" @click="addOrUpdate(record.helpDocId)" v-privilege="'support:helpDoc:update'">编辑</a-button>
             <a-button type="link" danger @click="onDelete(record.helpDocId)" v-privilege="'support:helpDoc:delete'">删除</a-button>
           </div>
@@ -68,7 +68,7 @@
       </template>
     </a-table>
 
-    <div class="dog-query-table-page">
+    <div class="query-table-page">
       <a-pagination
         showSizeChanger
         showQuickJumper
@@ -93,7 +93,7 @@
   import HelpDocFormDrawer from './help-doc-form-drawer.vue';
   import { helpDocApi } from '/@/api/support/help-doc-api';
   import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '/@/constants/common-const';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
@@ -177,7 +177,7 @@
       tableData.value = result.data.list;
       total.value = result.data.total;
     } catch (err) {
-      dogSentry.captureError(err);
+      sentry.captureError(err);
     } finally {
       tableLoading.value = false;
     }
@@ -239,7 +239,7 @@
       message.success('删除成功');
       queryHelpDocList();
     } catch (err) {
-      dogSentry.captureError(err);
+      sentry.captureError(err);
     } finally {
       tableLoading.value = false;
     }

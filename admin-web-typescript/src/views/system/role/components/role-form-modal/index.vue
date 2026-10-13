@@ -23,8 +23,8 @@
   import { message } from 'ant-design-vue';
   import { reactive, ref } from 'vue';
   import { roleApi } from '/@/api/system/role-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { sentry } from '/@/lib/sentry';
+  import { Loading } from '/@/components/framework/loading';
   // ----------------------- 以下是字段定义 emits props ---------------------
   let emits = defineEmits(['refresh']);
 
@@ -72,7 +72,7 @@
     formRef.value
       .validate()
       .then(async () => {
-        DogLoading.show();
+        Loading.show();
         try {
           if (form.roleId) {
             await roleApi.updateRole(form);
@@ -83,9 +83,9 @@
           emits('refresh');
           onClose();
         } catch (e) {
-          dogSentry.captureError(e);
+          sentry.captureError(e);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       })
       .catch((error) => {

@@ -20,9 +20,9 @@
 <script setup lang="ts">
   import { computed, onMounted, reactive, ref } from 'vue';
   import { message } from 'ant-design-vue';
-  import { DogLoading } from '/@/components/framework/dog-loading/index';
+  import { Loading } from '/@/components/framework/loading/index';
   import { employeeApi } from '/@/api/system/employee-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   const emits = defineEmits(['onSuccess']);
 
@@ -38,14 +38,14 @@
 
   async function getPasswordComplexityEnabled() {
     try {
-      DogLoading.show();
+      Loading.show();
       let res = await employeeApi.getPasswordComplexityEnabled();
       passwordComplexityEnabledFlag.value = res.data;
       tips.value = passwordComplexityEnabledFlag.value ? passwordComplexityEnabledTips : passwordTips;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
   onMounted(getPasswordComplexityEnabled);
@@ -87,7 +87,7 @@
           message.error('新密码与确认密码不一致');
           return;
         }
-        DogLoading.show();
+        Loading.show();
         try {
           await employeeApi.updateEmployeePassword(form);
           message.success('修改成功');
@@ -98,9 +98,9 @@
 
           emits('onSuccess');
         } catch (error) {
-          dogSentry.captureError(error);
+          sentry.captureError(error);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       })
       .catch((error) => {

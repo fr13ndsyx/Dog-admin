@@ -1,21 +1,21 @@
 <template>
-  <a-form class="dog-query-form" v-privilege="'support:operateLog:query'">
-    <a-row class="dog-query-form-row">
-      <a-form-item label="操作关键字" class="dog-query-form-item">
+  <a-form class="query-form" v-privilege="'support:operateLog:query'">
+    <a-row class="query-form-row">
+      <a-form-item label="操作关键字" class="query-form-item">
         <a-input style="width: 150px" v-model:value="queryForm.keywords" placeholder="模块/操作内容" />
       </a-form-item>
-      <a-form-item label="请求关键字" class="dog-query-form-item">
+      <a-form-item label="请求关键字" class="query-form-item">
         <a-input style="width: 270px" v-model:value="queryForm.requestKeywords" placeholder="请求地址/请求方法/请求参数/返回结果" />
       </a-form-item>
-      <a-form-item label="用户名称" class="dog-query-form-item">
+      <a-form-item label="用户名称" class="query-form-item">
         <a-input style="width: 100px" v-model:value="queryForm.userName" placeholder="用户名称" />
       </a-form-item>
 
-      <a-form-item label="请求时间" class="dog-query-form-item">
+      <a-form-item label="请求时间" class="query-form-item">
         <a-range-picker @change="changeCreateDate" v-model:value="createDateRange" :presets="defaultChooseTimeRange" style="width: 240px" />
       </a-form-item>
 
-      <a-form-item label="状态：" class="dog-query-form-item">
+      <a-form-item label="状态：" class="query-form-item">
         <a-radio-group v-model:value="queryForm.successFlag" @change="onSearch">
           <a-radio-button :value="undefined">全部</a-radio-button>
           <a-radio-button :value="true">成功</a-radio-button>
@@ -23,7 +23,7 @@
         </a-radio-group>
       </a-form-item>
 
-      <a-form-item class="dog-query-form-item dog-margin-left10">
+      <a-form-item class="query-form-item margin-left10">
         <a-button-group>
           <a-button type="primary" @click="ajaxQuery">
             <template #icon>
@@ -44,7 +44,7 @@
 
   <a-card size="small" :bordered="false" :hoverable="true" >
     <a-row justify="end">
-      <TableOperator class="dog-margin-bottom5" v-model="columns" :tableId="TABLE_ID_CONST.SUPPORT.CONFIG" :refresh="ajaxQuery" />
+      <TableOperator class="margin-bottom5" v-model="columns" :tableId="TABLE_ID_CONST.SUPPORT.CONFIG" :refresh="ajaxQuery" />
     </a-row>
     <a-table size="small" :loading="tableLoading" :dataSource="tableData" :columns="columns" bordered rowKey="operateLogId" :pagination="false">
       <template #bodyCell="{ text, record, column }">
@@ -62,18 +62,18 @@
         </template>
 
         <template v-if="column.dataIndex === 'operateUserType'">
-          <div>{{ $dogEnumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</div>
+          <div>{{ $enumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</div>
         </template>
 
         <template v-else-if="column.dataIndex === 'action'">
-          <div class="dog-table-operate">
+          <div class="table-operate">
             <a-button @click="showDetail(record.operateLogId)" type="link" v-privilege="'support:operateLog:detail'">详情</a-button>
           </div>
         </template>
       </template>
     </a-table>
 
-    <div class="dog-query-table-page">
+    <div class="query-table-page">
       <a-pagination
         showSizeChanger
         showQuickJumper
@@ -98,7 +98,7 @@
   import { PAGE_SIZE_OPTIONS } from '/@/constants/common-const';
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
   import uaparser from 'ua-parser-js';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
 
@@ -220,7 +220,7 @@
       total.value = responseModel.data.total;
       tableData.value = list;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       tableLoading.value = false;
     }

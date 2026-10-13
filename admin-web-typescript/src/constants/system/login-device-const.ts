@@ -1,7 +1,7 @@
 
-import { DogEnum } from '/@/types/dog-enum';
+import { Enum } from '/@/types/enum';
 
-export const LOGIN_DEVICE_ENUM: DogEnum<number> = {
+export const LOGIN_DEVICE_ENUM: Enum<number> = {
   PC: {
     value: 1,
     desc: '电脑端',

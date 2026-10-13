@@ -18,7 +18,7 @@
 <script setup lang="ts">
   import { onMounted, ref, watch } from 'vue';
   import { employeeApi } from '/@/api/system/employee-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   // =========== 属性定义 和 事件方法暴露 =============
 
@@ -66,7 +66,7 @@
       let resp = await employeeApi.queryAll(params);
       employeeList.value = resp.data;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     }
   }
   onMounted(query);

@@ -1,15 +1,15 @@
 <template>
   <a-row style="position: relative" v-show="pageTagFlag">
     <a-dropdown :trigger="['contextmenu']">
-      <div class="dog-page-tag">
+      <div class="page-tag">
         <a-tabs style="width: 100%" :tab-position="mode" v-model:activeKey="selectedKey" size="small" @tabClick="selectTab">
           <a-tab-pane v-for="item in tagNav" :key="item.menuName">
             <template #tab>
-              <span class="dog-page-tag-content">
-                <home-outlined style="font-size: 12px" v-if="item.menuName === HOME_PAGE_NAME" class="dog-page-tag-close" />
-                <component class="dog-page-tag-icon" v-else :is="$antIcons[item.menuIcon]" />
+              <span class="page-tag-content">
+                <home-outlined style="font-size: 12px" v-if="item.menuName === HOME_PAGE_NAME" class="page-tag-close" />
+                <component class="page-tag-icon" v-else :is="$antIcons[item.menuIcon]" />
                 {{ item.menuTitle }}
-                <close-outlined @click.stop="closeTag(item, false)" v-if="item.menuName !== HOME_PAGE_NAME" class="dog-page-tag-close" />
+                <close-outlined @click.stop="closeTag(item, false)" v-if="item.menuName !== HOME_PAGE_NAME" class="page-tag-close" />
               </span>
             </template>
           </a-tab-pane>
@@ -114,7 +114,7 @@
   @color-primary: v-bind('token.colorPrimary');
   @color-primary-bg: v-bind('token.colorPrimaryBg');
 
-  .dog-page-tag {
+  .page-tag {
     position: relative;
     box-sizing: border-box;
     display: flex;
@@ -127,7 +127,7 @@
     user-select: none;
     width: 100%;
 
-    .dog-page-tag-close {
+    .page-tag-close {
       margin-left: 5px;
       font-size: 12px;
       color: #666666;
@@ -160,7 +160,7 @@
       }
     }
 
-    .dog-page-tag-content {
+    .page-tag-content {
       display: inline-block;
       min-width: 100px;
 
@@ -176,7 +176,7 @@
         background: #eeeeee;
       }
 
-      .dog-page-tag-icon {
+      .page-tag-icon {
         margin-right: 5px;
       }
     }
@@ -216,7 +216,7 @@
         bottom: 0;
       }
 
-      .dog-page-tag-content {
+      .page-tag-content {
         &::before {
           content: '';
           position: absolute;
@@ -236,7 +236,7 @@
         }
       }
 
-      .dog-page-tag-close {
+      .page-tag-close {
         color: @color-primary;
       }
     }
@@ -274,7 +274,7 @@
           bottom: 0;
         }
 
-        .dog-page-tag-content {
+        .page-tag-content {
           color: @color-primary;
 
           &::before {
@@ -297,7 +297,7 @@
         }
       }
 
-      .dog-page-tag-close {
+      .page-tag-close {
         color: @color-primary;
       }
     }

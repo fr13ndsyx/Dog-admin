@@ -1,6 +1,6 @@
 <template>
   <a-card class="tree-container">
-    <a-row class="dog-margin-bottom10">
+    <a-row class="margin-bottom10">
       <a-input v-model:value.trim="keywords" placeholder="请输入部门名称" />
     </a-row>
     <a-tree
@@ -30,7 +30,7 @@
   import _ from 'lodash';
   import { departmentApi } from '/@/api/system/department-api';
   import departmentEmitter from '../../department-mitt';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   const DEPARTMENT_PARENT_ID = 0;
 

@@ -1,10 +1,10 @@
 <template>
-  <a-form class="dog-query-form">
-    <a-row class="dog-query-form-row">
-      <a-form-item label="关键字" class="dog-query-form-item" style="margin-right: 20px">
+  <a-form class="query-form">
+    <a-row class="query-form-row">
+      <a-form-item label="关键字" class="query-form-item" style="margin-right: 20px">
         <a-input style="width: 240px" v-model:value.trim="queryForm.searchWord" placeholder="反馈内容/创建人" />
       </a-form-item>
-      <a-form-item label="创建日期" class="dog-query-form-item" style="margin-right: 20px">
+      <a-form-item label="创建日期" class="query-form-item" style="margin-right: 20px">
         <a-range-picker
           v-model:value="chooseTimeRange"
           @change="changeCreateDate"
@@ -13,7 +13,7 @@
           style="width: 240px"
         />
       </a-form-item>
-      <a-form-item class="dog-query-form-item">
+      <a-form-item class="query-form-item">
         <a-button-group v-privilege="'feedback:query'">
           <a-button type="primary" @click="onSearch">
             <template #icon>
@@ -39,12 +39,12 @@
           <FilePreview :fileList="text" type="picture" />
         </template>
         <template v-if="column.dataIndex === 'userType'">
-          <span>{{ $dogEnumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</span>
+          <span>{{ $enumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</span>
         </template>
       </template>
     </a-table>
 
-    <div class="dog-query-table-page">
+    <div class="query-table-page">
       <a-pagination
         showSizeChanger
         showQuickJumper
@@ -67,7 +67,7 @@
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
   import { feedbackApi } from '/@/api/support/feedback-api';
   import FilePreview from '/@/components/support/file-preview/index.vue';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   // ----------------------- 表格列 --------------------------------------
   const tableColumns = reactive([
@@ -125,7 +125,7 @@
       tableData.value = result.data.list;
       total.value = result.data.total;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       tableLoading.value = false;
     }

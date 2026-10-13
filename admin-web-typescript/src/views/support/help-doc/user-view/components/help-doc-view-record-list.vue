@@ -1,11 +1,11 @@
 <template>
   <div>
-    <a-form class="dog-query-form">
-      <a-row class="dog-query-form-row">
-        <a-form-item label="关键字" class="dog-query-form-item" style="width: 280px">
+    <a-form class="query-form">
+      <a-row class="query-form-row">
+        <a-form-item label="关键字" class="query-form-item" style="width: 280px">
           <a-input v-model:value="queryForm.keywords" placeholder="姓名/IP/设备" />
         </a-form-item>
-        <a-form-item class="dog-query-form-item dog-margin-left10">
+        <a-form-item class="query-form-item margin-left10">
           <a-button-group>
             <a-button type="primary" @click="onSearch">
               <template #icon>
@@ -29,7 +29,7 @@
         <template v-if="column.dataIndex === 'lastIp'"> {{ text }} ({{ record.lastDevice }}) </template>
       </template>
     </a-table>
-    <div class="dog-query-table-page">
+    <div class="query-table-page">
       <a-pagination
         showSizeChanger
         showQuickJumper
@@ -50,7 +50,7 @@
   import { helpDocApi } from '/@/api/support/help-doc-api';
   import { PAGE_SIZE, PAGE_SIZE_OPTIONS } from '/@/constants/common-const';
   import uaparser from 'ua-parser-js';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   const props = defineProps({
     helpDocId: {
@@ -129,7 +129,7 @@
       tableData.value = result.data.list;
       total.value = result.data.total;
     } catch (err) {
-      dogSentry.captureError(err);
+      sentry.captureError(err);
     } finally {
       tableLoading.value = false;
     }

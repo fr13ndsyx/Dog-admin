@@ -1,4 +1,4 @@
-import { DogEnum } from '/@/types/dog-enum';
+import { Enum } from '/@/types/enum';
 
 export const PAGE_SIZE = 10;
 
@@ -16,7 +16,7 @@ export const showTableTotal = function (total: number | string) {
   return `共${total}条`;
 };
 
-export const FLAG_NUMBER_ENUM: DogEnum<number> = {
+export const FLAG_NUMBER_ENUM: Enum<number> = {
   TRUE: {
     value: 1,
     desc: '是',
@@ -27,7 +27,7 @@ export const FLAG_NUMBER_ENUM: DogEnum<number> = {
   },
 };
 
-export const GENDER_ENUM: DogEnum<number> = {
+export const GENDER_ENUM: Enum<number> = {
   UNKNOWN: {
     value: 0,
     desc: '未知',
@@ -42,7 +42,7 @@ export const GENDER_ENUM: DogEnum<number> = {
   },
 };
 
-export const USER_TYPE_ENUM: DogEnum<number> = {
+export const USER_TYPE_ENUM: Enum<number> = {
   ADMIN_EMPLOYEE: {
     value: 1,
     desc: '员工',

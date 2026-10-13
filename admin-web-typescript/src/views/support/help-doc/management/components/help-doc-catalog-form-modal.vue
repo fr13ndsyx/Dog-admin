@@ -18,8 +18,8 @@
   import { reactive, ref } from 'vue';
   import { helpDocCatalogApi } from '/@/api/support/help-doc-catalog-api';
   import HelpDocCatalogTreeSelect from './help-doc-catalog-tree-select.vue';
-  import { DogLoading } from '/@/components/framework/dog-loading';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { Loading } from '/@/components/framework/loading';
+  import { sentry } from '/@/lib/sentry';
 
   // ----------------------- 对外暴漏 ---------------------
 
@@ -91,21 +91,21 @@
   // ----------------------- form 表单  ajax 操作 ---------------------
   //添加目录ajax请求
   async function addHelpDocCatalog() {
-    DogLoading.show();
+    Loading.show();
     try {
       await helpDocCatalogApi.add(formState);
       emits('refresh');
       closeModal();
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 
   //更新目录ajax请求
   async function updateHelpDocCatalog() {
-    DogLoading.show();
+    Loading.show();
     try {
       if (formState.parentId === formState.helpDocCatalogId) {
         message.warning('上级菜单不能为自己');
@@ -115,9 +115,9 @@
       emits('refresh');
       closeModal();
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 </script>

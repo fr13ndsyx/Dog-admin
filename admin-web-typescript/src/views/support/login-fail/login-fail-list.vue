@@ -1,18 +1,18 @@
 <template>
   <!---------- 查询表单form begin ----------->
-  <a-form class="dog-query-form">
-    <a-row class="dog-query-form-row">
-      <a-form-item label="登录名" class="dog-query-form-item">
+  <a-form class="query-form">
+    <a-row class="query-form-row">
+      <a-form-item label="登录名" class="query-form-item">
         <a-input style="width: 300px" v-model:value="queryForm.loginName" placeholder="登录名" />
       </a-form-item>
-      <a-form-item label="快速筛选" class="dog-query-form-item">
+      <a-form-item label="快速筛选" class="query-form-item">
         <a-radio-group v-model:value="queryForm.lockFlag" @change="onSearch" button-style="solid">
           <a-radio-button :value="undefined">全部</a-radio-button>
           <a-radio-button :value="true">已锁定</a-radio-button>
           <a-radio-button :value="false">未锁定</a-radio-button>
         </a-radio-group>
       </a-form-item>
-      <a-form-item label="锁定时间" class="dog-query-form-item">
+      <a-form-item label="锁定时间" class="query-form-item">
         <a-range-picker
           v-model:value="queryForm.loginLockBeginTime"
           :presets="defaultTimeRanges"
@@ -20,7 +20,7 @@
           @change="onChangeLoginLockBeginTime"
         />
       </a-form-item>
-      <a-form-item class="dog-query-form-item">
+      <a-form-item class="query-form-item">
         <a-button-group>
           <a-button type="primary" @click="onSearch">
             <template #icon>
@@ -28,7 +28,7 @@
             </template>
             查询
           </a-button>
-          <a-button @click="resetQuery" class="dog-margin-left10">
+          <a-button @click="resetQuery" class="margin-left10">
             <template #icon>
               <ReloadOutlined />
             </template>
@@ -42,8 +42,8 @@
 
   <a-card size="small" :bordered="false" :hoverable="true">
     <!---------- 表格操作行 begin ----------->
-    <a-row class="dog-table-btn-block">
-      <div class="dog-table-operate-block">
+    <a-row class="table-btn-block">
+      <div class="table-operate-block">
         <a-button @click="confirmBatchDelete" danger :disabled="selectedRowKeyList.length === 0">
           <template #icon>
             <DeleteOutlined />
@@ -51,7 +51,7 @@
           解除锁定
         </a-button>
       </div>
-      <div class="dog-table-setting-block">
+      <div class="table-setting-block">
         <TableOperator v-model="columns" :tableId="null" :refresh="queryData" />
       </div>
     </a-row>
@@ -70,7 +70,7 @@
     >
       <template #bodyCell="{ text, column }">
         <template v-if="column.dataIndex === 'userType'">
-          <span>{{ $dogEnumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</span>
+          <span>{{ $enumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</span>
         </template>
         <template v-if="column.dataIndex === 'lockFlag'">
           <template v-if="text">
@@ -84,7 +84,7 @@
     </a-table>
     <!---------- 表格 end ----------->
 
-    <div class="dog-query-table-page">
+    <div class="query-table-page">
       <a-pagination
         showSizeChanger
         showQuickJumper
@@ -103,10 +103,10 @@
 <script setup lang="ts">
   import { reactive, ref, onMounted } from 'vue';
   import { message, Modal } from 'ant-design-vue';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import { loginFailApi } from '/@/api/support/login-fail-api';
   import { PAGE_SIZE_OPTIONS } from '/@/constants/common-const';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { defaultTimeRanges } from '/@/lib/default-time-ranges';
 
@@ -186,7 +186,7 @@
       tableData.value = queryResult.data.list;
       total.value = queryResult.data.total;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       tableLoading.value = false;
     }
@@ -226,14 +226,14 @@
   //请求批量删除
   async function requestBatchDelete() {
     try {
-      DogLoading.show();
+      Loading.show();
       await loginFailApi.batchDelete(selectedRowKeyList.value);
       message.success('解锁成功');
       queryData();
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 </script>

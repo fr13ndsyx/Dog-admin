@@ -25,7 +25,7 @@
 <script setup lang="ts">
   import { onActivated, onMounted, ref } from 'vue';
   import { helpDocApi } from '/@/api/support/help-doc-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   interface HelpDoc {
     helpDocId: number;
@@ -46,7 +46,7 @@
       helpDocs.value = response.data;
     } catch (error) {
       loadFailed.value = true;
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
       loading.value = false;
     }

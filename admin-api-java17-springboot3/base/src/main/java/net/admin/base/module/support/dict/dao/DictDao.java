@@ -1,0 +1,29 @@
+package net.admin.base.module.support.dict.dao;
+
+import java.util.List;
+
+import net.admin.base.module.support.dict.domain.entity.DictEntity;
+import net.admin.base.module.support.dict.domain.form.DictQueryForm;
+import net.admin.base.module.support.dict.domain.vo.DictVO;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
+
+
+@Mapper
+@Component
+public interface DictDao extends BaseMapper<DictEntity> {
+
+    /**
+     * 分页 查询
+     */
+    List<DictVO> queryPage(Page page, @Param("queryForm") DictQueryForm queryForm);
+
+    /**
+     * 根据 dictCode 去查询
+     */
+    DictEntity selectByCode(@Param("code") String code);
+
+}

@@ -17,7 +17,7 @@
   import { fileApi } from '/@/api/support/file-api';
   import '@wangeditor-next/editor/dist/css/style.css';
   import { Editor, Toolbar } from '@wangeditor-next/editor-for-vue';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   //菜单
   const editorConfig = { MENU_CONF: {} };
@@ -32,7 +32,7 @@
         let data = res.data;
         insertFn(data.fileUrl);
       } catch (error) {
-        dogSentry.captureError(error);
+        sentry.captureError(error);
       }
     },
   };

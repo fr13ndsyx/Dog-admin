@@ -1,11 +1,11 @@
 <template>
-  <a-form class="dog-query-form">
-    <a-row class="dog-query-form-row">
-      <a-form-item label="部门名称" class="dog-query-form-item">
+  <a-form class="query-form">
+    <a-row class="query-form-row">
+      <a-form-item label="部门名称" class="query-form-item">
         <a-input style="width: 300px" v-model:value="keywords" placeholder="请输入部门名称" />
       </a-form-item>
 
-      <a-form-item class="dog-query-form-item dog-margin-left10">
+      <a-form-item class="query-form-item margin-left10">
         <a-button-group>
           <a-button v-privilege="'support:department:query'" type="primary" @click="onSearch">
             <template #icon>
@@ -20,13 +20,13 @@
             重置
           </a-button>
         </a-button-group>
-        <a-button v-privilege="'system:department:add'" type="primary" @click="addDepartment()" class="dog-margin-left20">
+        <a-button v-privilege="'system:department:add'" type="primary" @click="addDepartment()" class="margin-left20">
           <template #icon>
             <PlusOutlined />
           </template>
           新建一级部门
         </a-button>
-        <a-radio-group v-model:value="viewMode" button-style="solid" class="dog-margin-left20">
+        <a-radio-group v-model:value="viewMode" button-style="solid" class="margin-left20">
           <a-radio-button :value="VIEW_MODE_TABLE">表格</a-radio-button>
           <a-radio-button :value="VIEW_MODE_CANVAS">画布</a-radio-button>
         </a-radio-group>
@@ -75,7 +75,7 @@
     >
       <template #bodyCell="{ record, column }">
         <template v-if="column.dataIndex === 'action'">
-          <div class="dog-table-operate">
+          <div class="table-operate">
             <a-button @click="addDepartment(record)" v-privilege="'system:department:add'" type="link">添加下级</a-button>
             <a-button @click="updateDepartment(record)" v-privilege="'system:department:update'" type="link">编辑</a-button>
             <a-button
@@ -100,11 +100,11 @@
   import { Modal } from 'ant-design-vue';
   import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
   import _ from 'lodash';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import DepartmentFormModal from './components/department-form-modal.vue';
   import OrgCanvas from './components/pearl-visuals/OrgCanvas.vue';
   import type { OrgNode } from './components/pearl-visuals/types';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   interface Department {
     departmentId: number;
@@ -156,7 +156,7 @@
         selectedMembers.value = res.data;
       }
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       if (selectedOrgNodeId.value === node.id) {
         membersLoading.value = false;
@@ -179,7 +179,7 @@
       const res = await employeeApi.queryAll();
       memberCountByDepartmentId.value = _.countBy(res.data, 'departmentId');
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     }
   }
 
@@ -261,7 +261,7 @@
 
       defaultExpandedRowList.value = departmentTreeData.value.map((department) => department.departmentId);
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       tableLoading.value = false;
     }
@@ -347,14 +347,14 @@
       okText: '删除',
       okType: 'danger',
       async onOk() {
-        DogLoading.show();
+        Loading.show();
         try {
           await departmentApi.deleteDepartment(id);
           await queryDepartmentTree();
         } catch (error) {
-          dogSentry.captureError(error);
+          sentry.captureError(error);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       },
       cancelText: '取消',

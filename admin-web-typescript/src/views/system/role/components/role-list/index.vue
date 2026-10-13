@@ -24,9 +24,9 @@
   import _ from 'lodash';
   import { computed, onMounted, ref } from 'vue';
   import { roleApi } from '/@/api/system/role-api';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import RoleFormModal from '../role-form-modal/index.vue';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   // ----------------------- 角色列表显示 ---------------------
   const roleList = ref([]);
@@ -68,15 +68,15 @@
       okText: '确定',
       okType: 'danger',
       async onOk() {
-        DogLoading.show();
+        Loading.show();
         try {
           await roleApi.deleteRole(roleId);
           message.info('删除成功');
           queryAllRole();
         } catch (e) {
-          dogSentry.captureError(e);
+          sentry.captureError(e);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       },
       cancelText: '取消',

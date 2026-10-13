@@ -15,8 +15,8 @@
 <script setup lang="ts">
   import { ref } from 'vue';
   import { fileApi } from '/@/api/support/file-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { sentry } from '/@/lib/sentry';
+  import { Loading } from '/@/components/framework/loading';
 
   const imgFileType = ['jpg', 'jpeg', 'png', 'gif'];
   const previewUrl = ref();
@@ -24,15 +24,15 @@
   function showPreview(fileItem) {
     if (!fileItem.fileUrl) {
       (async () => {
-        DogLoading.show();
+        Loading.show();
         try {
           let res = await fileApi.getUrl(fileItem.fileKey);
           fileItem.fileUrl = res.data;
           showFile(fileItem);
         } catch (e) {
-          dogSentry.captureError(e);
+          sentry.captureError(e);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       })();
     } else {

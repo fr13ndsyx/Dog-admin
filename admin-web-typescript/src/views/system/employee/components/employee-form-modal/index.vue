@@ -27,7 +27,7 @@
         <a-input v-model:value.trim="form.email" placeholder="请输入邮箱" />
       </a-form-item>
       <a-form-item label="性别" name="gender">
-        <dog-enum-select style="width: 100%" v-model:value="form.gender" placeholder="请选择性别" enum-name="GENDER_ENUM" />
+        <enum-select style="width: 100%" v-model:value="form.gender" placeholder="请选择性别" enum-name="GENDER_ENUM" />
       </a-form-item>
       <a-form-item label="状态" name="disabledFlag">
         <a-select v-model:value="form.disabledFlag" placeholder="请选择状态">
@@ -56,11 +56,11 @@
   import { employeeApi } from '/@/api/system/employee-api';
   import { roleApi } from '/@/api/system/role-api';
   import DepartmentTreeSelect from '/@/components/system/department-tree-select/index.vue';
-  import DogEnumSelect from '/@/components/framework/dog-enum-select/index.vue';
+  import EnumSelect from '/@/components/framework/enum-select/index.vue';
   import { GENDER_ENUM } from '/@/constants/common-const';
   import { regular } from '/@/constants/regular-const';
-  import { DogLoading } from '/@/components/framework/dog-loading';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { Loading } from '/@/components/framework/loading';
+  import { sentry } from '/@/lib/sentry';
   // ----------------------- 以下是字段定义 emits props ---------------------
   const departmentTreeSelect = ref();
   // emit
@@ -157,7 +157,7 @@
       message.error('参数验证错误，请仔细填写表单数据!');
       return;
     }
-    DogLoading.show();
+    Loading.show();
     if (form.employeeId) {
       await updateEmployee(keepAdding);
     } else {
@@ -177,9 +177,9 @@
       }
       emit('refresh');
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
   async function updateEmployee(keepAdding) {
@@ -193,9 +193,9 @@
       }
       emit('refresh');
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 

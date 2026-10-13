@@ -14,7 +14,7 @@
         <a-input style="width: 100%" v-model:value="form.updateVersion" placeholder="版本" />
       </a-form-item>
       <a-form-item label="更新类型" name="type">
-        <DogEnumSelect width="100%" v-model:value="form.type" enumName="CHANGE_LOG_TYPE_ENUM" placeholder="更新类型" />
+        <EnumSelect width="100%" v-model:value="form.type" enumName="CHANGE_LOG_TYPE_ENUM" placeholder="更新类型" />
       </a-form-item>
       <a-form-item label="发布人" name="publishAuthor">
         <a-input style="width: 100%" v-model:value="form.publishAuthor" placeholder="发布人" />
@@ -42,10 +42,10 @@
   import { reactive, ref, nextTick } from 'vue';
   import _ from 'lodash';
   import { message } from 'ant-design-vue';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import { changeLogApi } from '/@/api/support/change-log-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
-  import DogEnumSelect from '/@/components/framework/dog-enum-select/index.vue';
+  import { sentry } from '/@/lib/sentry';
+  import EnumSelect from '/@/components/framework/enum-select/index.vue';
 
   // ------------------------ 事件 ------------------------
 
@@ -108,7 +108,7 @@
 
   // 新建、编辑API
   async function save() {
-    DogLoading.show();
+    Loading.show();
     try {
       if (form.changeLogId) {
         await changeLogApi.update(form);
@@ -119,9 +119,9 @@
       emits('reloadList');
       onClose();
     } catch (err) {
-      dogSentry.captureError(err);
+      sentry.captureError(err);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 

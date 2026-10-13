@@ -4,7 +4,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '../..');
 const web = path.join(root, 'admin-web-typescript');
 const api = path.join(root, 'admin-api-java17-springboot3');
-const skippedDirectories = new Set(['.git', 'node_modules', 'target', 'dist', 'runtime', 'memory']);
+const skippedDirectories = new Set(['.git', 'node_modules', 'target', 'dist', 'runtime', 'memory', '.idea', '.claude']);
 const textExtensions = new Set(['.java', '.xml', '.yaml', '.factories', '.vm', '.ts', '.vue', '.less', '.cjs', '.json', '.md']);
 const files = [];
 function collectFiles(directory) {
@@ -16,17 +16,22 @@ function collectFiles(directory) {
 }
 collectFiles(root);
 const legacyIdentity = /lab\d+|\d+lab__|[s]mart[\w-]*|\bsa-(?:admin|base|parent)\b|classpath\*:sa-\*\.yaml/i;
+const removedPrefix = /[dD]og/;
 const licenseAttributionFile = path.join(root, 'README.md');
 for (const filename of files) {
-  assert.doesNotMatch(path.relative(root, filename), legacyIdentity, filename);
-  if (filename === licenseAttributionFile) continue;
-  if (textExtensions.has(path.extname(filename)) || path.basename(filename).startsWith('.env.')) {
-    assert.doesNotMatch(fs.readFileSync(filename, 'utf8'), legacyIdentity, filename);
+  const relativeName = path.relative(root, filename);
+  assert.doesNotMatch(relativeName, legacyIdentity, filename);
+  assert.doesNotMatch(relativeName, removedPrefix, filename);
+  if (!textExtensions.has(path.extname(filename)) && !path.basename(filename).startsWith('.env.')) continue;
+  const text = fs.readFileSync(filename, 'utf8');
+  assert.doesNotMatch(text, removedPrefix, filename);
+  if (filename !== licenseAttributionFile) {
+    assert.doesNotMatch(text, legacyIdentity, filename);
   }
 }
 const packageJson = JSON.parse(fs.readFileSync(path.join(web, 'package.json'), 'utf8'));
 const lockJson = JSON.parse(fs.readFileSync(path.join(web, 'package-lock.json'), 'utf8'));
-assert.equal(packageJson.name, 'dogadmin');
+assert.equal(packageJson.name, 'admin');
 assert.equal(lockJson.name, packageJson.name);
 assert.equal(lockJson.packages[''].name, packageJson.name);
 assert.deepEqual(lockJson.packages[''].dependencies, packageJson.dependencies);
@@ -36,7 +41,7 @@ const classes = new Map();
 for (const filename of javaFiles) {
   const text = fs.readFileSync(filename, 'utf8');
   const packageName = text.match(/^package\s+([\w.]+);/m)?.[1];
-  assert.ok(packageName?.startsWith('net.dogadmin.'), filename);
+  assert.ok(packageName?.startsWith('net.admin.'), filename);
   const sourceRoot = filename.match(/^(.*[\\/]src[\\/](?:main|test)[\\/]java)[\\/]/)?.[1];
   assert.ok(sourceRoot, filename);
   const expectedPath = packageName.split('.').join(path.sep) + path.sep + path.basename(filename);
@@ -45,7 +50,7 @@ for (const filename of javaFiles) {
 }
 for (const filename of javaFiles) {
   const text = fs.readFileSync(filename, 'utf8');
-  for (const match of text.matchAll(/^import\s+(?:static\s+)?(net\.dogadmin\.[\w.*]+);/gm)) {
+  for (const match of text.matchAll(/^import\s+(?:static\s+)?(net\.admin\.[\w.*]+);/gm)) {
     const importedName = match[1];
     if (importedName.endsWith('.*')) {
       const prefix = importedName.slice(0, -1);
@@ -56,48 +61,48 @@ for (const filename of javaFiles) {
   }
 }
 const parentPom = fs.readFileSync(path.join(api, 'pom.xml'), 'utf8');
-assert.match(parentPom, /<groupId>net\.dogadmin<\/groupId>/);
-assert.match(parentPom, /<artifactId>dog-parent<\/artifactId>/);
-for (const moduleName of ['dog-admin', 'dog-base']) {
+assert.match(parentPom, /<groupId>net\.admin<\/groupId>/);
+assert.match(parentPom, /<artifactId>admin-parent<\/artifactId>/);
+for (const moduleName of ['admin', 'base']) {
   assert.ok(parentPom.includes('<module>' + moduleName + '</module>'));
   const modulePom = fs.readFileSync(path.join(api, moduleName, 'pom.xml'), 'utf8');
   assert.ok(modulePom.includes('<artifactId>' + moduleName + '</artifactId>'));
-  assert.match(modulePom, /<artifactId>dog-parent<\/artifactId>/);
+  assert.match(modulePom, /<artifactId>admin-parent<\/artifactId>/);
 }
-assert.match(fs.readFileSync(path.join(api, 'dog-admin/pom.xml'), 'utf8'), /<mainClass>net\.dogadmin\.admin\.AdminApplication<\/mainClass>/);
-const yamlProcessor = fs.readFileSync(path.join(api, 'dog-base/src/main/java/net/dogadmin/base/config/YamlProcessor.java'), 'utf8');
-assert.ok(yamlProcessor.includes('classpath*:dog-*.yaml'));
-const factories = fs.readFileSync(path.join(api, 'dog-base/src/main/resources/META-INF/spring.factories'), 'utf8');
-assert.ok(factories.includes('net.dogadmin.base.config.YamlProcessor'));
+assert.match(fs.readFileSync(path.join(api, 'admin/pom.xml'), 'utf8'), /<mainClass>net\.admin\.admin\.AdminApplication<\/mainClass>/);
+const yamlProcessor = fs.readFileSync(path.join(api, 'base/src/main/java/net/admin/base/config/YamlProcessor.java'), 'utf8');
+assert.ok(yamlProcessor.includes('classpath*:base.yaml'));
+const factories = fs.readFileSync(path.join(api, 'base/src/main/resources/META-INF/spring.factories'), 'utf8');
+assert.ok(factories.includes('net.admin.base.config.YamlProcessor'));
 for (const environment of ['dev', 'test', 'pre', 'prod']) {
-  const baseConfig = fs.readFileSync(path.join(api, 'dog-base/src/main/resources', environment, 'dog-base.yaml'), 'utf8');
-  const applicationConfig = fs.readFileSync(path.join(api, 'dog-admin/src/main/resources', environment, 'application.yaml'), 'utf8');
-  assert.ok(baseConfig.includes('${MYSQL_DATABASE:dogadmin}'));
+  const baseConfig = fs.readFileSync(path.join(api, 'base/src/main/resources', environment, 'base.yaml'), 'utf8');
+  const applicationConfig = fs.readFileSync(path.join(api, 'admin/src/main/resources', environment, 'application.yaml'), 'utf8');
+  assert.ok(baseConfig.includes('${MYSQL_DATABASE:admin}'));
   assert.ok(baseConfig.includes('sm2-private-key: ${API_ENCRYPT_PRIVATE_KEY}'), environment + ' SM2 private key must come from environment');
-  assert.match(applicationConfig, /name: dog-admin/);
+  assert.match(applicationConfig, /name: admin/);
 }
 for (const filename of files.filter(filename => filename.endsWith('.xml'))) {
   const text = fs.readFileSync(filename, 'utf8');
-  for (const match of text.matchAll(/(?:namespace|type|resultType|parameterType|class)="(net\.dogadmin\.[\w.]+)"/g)) {
+  for (const match of text.matchAll(/(?:namespace|type|resultType|parameterType|class)="(net\.admin\.[\w.]+)"/g)) {
     assert.ok(classes.has(match[1]), match[1]);
   }
 }
-assert.ok(fs.existsSync(path.join(web, 'src/theme/dogadmin.less')));
-assert.ok(fs.readFileSync(path.join(web, 'src/theme/index.less'), 'utf8').includes("'./dogadmin.less'"));
-assert.ok(fs.readFileSync(path.join(web, 'src/config/app-config.ts'), 'utf8').includes("websiteName: 'dogadmin'"));
+assert.ok(fs.existsSync(path.join(web, 'src/theme/admin.less')));
+assert.ok(fs.readFileSync(path.join(web, 'src/theme/index.less'), 'utf8').includes("'./admin.less'"));
+assert.ok(fs.readFileSync(path.join(web, 'src/config/app-config.ts'), 'utf8').includes("websiteName: 'admin'"));
 assert.equal(fs.readFileSync(path.join(root, 'mysql/admin.sql'), 'utf8').match(/^CREATE TABLE /gm).length, 22);
-assert.ok(fs.statSync(path.join(api, 'dog-base/src/main/resources/ip2region.xdb')).size > 0);
-process.stdout.write('dogadmin identity, Java packages, mapper references and configuration checks passed.\n');
+assert.ok(fs.statSync(path.join(api, 'base/src/main/resources/ip2region.xdb')).size > 0);
+process.stdout.write('admin identity, Java packages, mapper references and configuration checks passed.\n');
 const vm = require('node:vm');
 const ts = require('typescript');
 const { sm2 } = require('sm-crypto');
 const SM2_CIPHER_MODE_C1C3C2 = 1;
 const PUBLIC_KEY_URL = '/login/getEncryptPublicKey';
-const apiEncryptDirectory = path.join(api, 'dog-base/src/main/java/net/dogadmin/base/module/support/apiencrypt/service');
+const apiEncryptDirectory = path.join(api, 'base/src/main/java/net/admin/base/module/support/apiencrypt/service');
 const encryptSource = fs.readFileSync(path.join(web, 'src/lib/encrypt.ts'), 'utf8');
 assert.deepEqual(fs.readdirSync(apiEncryptDirectory).sort(), ['ApiEncryptService.java', 'ApiEncryptServiceSmImpl.java']);
 for (const source of [encryptSource, fs.readFileSync(path.join(apiEncryptDirectory, 'ApiEncryptServiceSmImpl.java'), 'utf8')]) {
-  assert.doesNotMatch(source, /dogadmindogadmin|_KEY = ['"]/, 'encryption keys must not be hardcoded');
+  assert.doesNotMatch(source, /adminadmin|_KEY = ['"]/, 'encryption keys must not be hardcoded');
 }
 const keyPair = sm2.generateKeyPairHex();
 const requestedUrls = [];
@@ -123,7 +128,7 @@ const decryptFrontendCipher = (cipher) => {
   return sm2.doDecrypt(cipher.slice(2), keyPair.privateKey, SM2_CIPHER_MODE_C1C3C2);
 };
 (async () => {
-  for (const value of ['dogadmin login', '中文密码验证', { loginName: 'admin', data: '地区与权限' }]) {
+  for (const value of ['admin login', '中文密码验证', { loginName: 'admin', data: '地区与权限' }]) {
     const plain = typeof value === 'object' ? JSON.stringify(value) : value;
     assert.equal(decryptFrontendCipher(await encryptData(value)), plain);
   }

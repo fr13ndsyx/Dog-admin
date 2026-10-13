@@ -43,9 +43,9 @@
   import { Modal } from 'ant-design-vue';
   import { fileApi } from '/@/api/support/file-api';
   import { useUserStore } from '/@/store/modules/system/user';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import { FILE_FOLDER_TYPE_ENUM } from '/@/constants/support/file-const';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   const props = defineProps({
     value: String,
     buttonText: {
@@ -133,7 +133,7 @@
 
   const emit = defineEmits(['update:value', 'change']);
   const customRequest = async (options) => {
-    DogLoading.show();
+    Loading.show();
     try {
       console.log(options);
       const formData = new FormData();
@@ -145,9 +145,9 @@
       fileList.value.push(file);
       emit('change', fileList.value);
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   };
 

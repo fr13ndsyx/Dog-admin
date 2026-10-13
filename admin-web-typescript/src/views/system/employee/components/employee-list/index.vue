@@ -18,7 +18,7 @@
             </a-button>
           </template>
         </a-input-search>
-        <a-button @click="reset" class="dog-margin-left10">
+        <a-button @click="reset" class="margin-left10">
           <template #icon>
             <ReloadOutlined />
           </template>
@@ -31,7 +31,7 @@
       <a-button class="btn" @click="updateEmployeeDepartment" v-privilege="'system:employee:department:update'">调整部门</a-button>
       <a-button class="btn" @click="batchDelete" v-privilege="'system:employee:delete'">批量删除</a-button>
 
-      <span class="dog-table-column-operate">
+      <span class="table-column-operate">
         <TableOperator v-model="columns" :tableId="TABLE_ID_CONST.SYSTEM.EMPLOYEE" :refresh="queryEmployee" />
       </span>
     </div>
@@ -55,10 +55,10 @@
           <a-tag :color="text ? 'error' : 'processing'">{{ text ? '禁用' : '启用' }}</a-tag>
         </template>
         <template v-else-if="column.dataIndex === 'gender'">
-          <span>{{ $dogEnumPlugin.getDescByValue('GENDER_ENUM', text) }}</span>
+          <span>{{ $enumPlugin.getDescByValue('GENDER_ENUM', text) }}</span>
         </template>
         <template v-else-if="column.dataIndex === 'operate'">
-          <div class="dog-table-operate">
+          <div class="table-operate">
             <a-button v-privilege="'system:employee:update'" type="link" size="small" @click="showDrawer(record)">编辑</a-button>
             <a-button
               v-privilege="'system:employee:password:reset'"
@@ -74,7 +74,7 @@
         </template>
       </template>
     </a-table>
-    <div class="dog-query-table-page">
+    <div class="query-table-page">
       <a-pagination
         showSizeChanger
         showQuickJumper
@@ -100,12 +100,12 @@
   import { computed, createVNode, reactive, ref, watch } from 'vue';
   import { employeeApi } from '/@/api/system/employee-api';
   import { PAGE_SIZE } from '/@/constants/common-const';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import EmployeeFormModal from '../employee-form-modal/index.vue';
   import EmployeeDepartmentFormModal from '../employee-department-form-modal/index.vue';
   import EmployeePasswordDialog from '../employee-password-dialog/index.vue';
   import { PAGE_SIZE_OPTIONS, showTableTotal } from '/@/constants/common-const';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
 
@@ -214,7 +214,7 @@
       selectedRowKeys.value = [];
       selectedRows.value = [];
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
       tableLoading.value = false;
     }
@@ -236,7 +236,7 @@
       selectedRowKeys.value = [];
       selectedRows.value = [];
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
       tableLoading.value = false;
     }
@@ -280,7 +280,7 @@
       okText: '删除',
       okType: 'danger',
       async onOk() {
-        DogLoading.show();
+        Loading.show();
         try {
           await employeeApi.batchDeleteEmployee(employeeIdArray);
           message.success('删除成功');
@@ -288,9 +288,9 @@
           selectedRowKeys.value = [];
           selectedRows.value = [];
         } catch (error) {
-          dogSentry.captureError(error);
+          sentry.captureError(error);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       },
       cancelText: '取消',
@@ -335,16 +335,16 @@
       okText: '确定',
       okType: 'danger',
       async onOk() {
-        DogLoading.show();
+        Loading.show();
         try {
           let { data: passWord } = await employeeApi.resetPassword(id);
           message.success('重置成功');
           employeePasswordDialog.value.showModal(name, passWord);
           queryEmployee();
         } catch (error) {
-          dogSentry.captureError(error);
+          sentry.captureError(error);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       },
       cancelText: '取消',
@@ -361,15 +361,15 @@
       okText: '确定',
       okType: 'danger',
       async onOk() {
-        DogLoading.show();
+        Loading.show();
         try {
           await employeeApi.updateDisabled(id);
           message.success(`${disabledFlag ? '启用' : '禁用'}成功`);
           queryEmployee();
         } catch (error) {
-          dogSentry.captureError(error);
+          sentry.captureError(error);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       },
       cancelText: '取消',

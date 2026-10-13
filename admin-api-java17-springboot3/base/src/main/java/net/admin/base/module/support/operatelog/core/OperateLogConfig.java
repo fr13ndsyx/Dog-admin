@@ -1,0 +1,29 @@
+package net.admin.base.module.support.operatelog.core;
+
+import lombok.Builder;
+import lombok.Data;
+import net.admin.base.module.support.operatelog.domain.OperateLogEntity;
+
+import java.util.function.Function;
+
+@Data
+@Builder
+public class OperateLogConfig {
+
+    /**
+     * 操作日志存储方法
+     */
+    private Function<OperateLogEntity, Boolean> saveFunction;
+
+    /**
+     * 核心线程数
+     */
+    private Integer corePoolSize;
+
+    /**
+     * 队列大小
+     */
+    private Integer queueCapacity;
+
+
+}

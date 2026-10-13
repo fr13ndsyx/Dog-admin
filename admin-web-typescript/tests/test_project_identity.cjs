@@ -16,8 +16,10 @@ function collectFiles(directory) {
 }
 collectFiles(root);
 const legacyIdentity = /lab\d+|\d+lab__|[s]mart[\w-]*|\bsa-(?:admin|base|parent)\b|classpath\*:sa-\*\.yaml/i;
+const licenseAttributionFile = path.join(root, 'README.md');
 for (const filename of files) {
   assert.doesNotMatch(path.relative(root, filename), legacyIdentity, filename);
+  if (filename === licenseAttributionFile) continue;
   if (textExtensions.has(path.extname(filename)) || path.basename(filename).startsWith('.env.')) {
     assert.doesNotMatch(fs.readFileSync(filename, 'utf8'), legacyIdentity, filename);
   }
@@ -71,6 +73,7 @@ for (const environment of ['dev', 'test', 'pre', 'prod']) {
   const baseConfig = fs.readFileSync(path.join(api, 'dog-base/src/main/resources', environment, 'dog-base.yaml'), 'utf8');
   const applicationConfig = fs.readFileSync(path.join(api, 'dog-admin/src/main/resources', environment, 'application.yaml'), 'utf8');
   assert.ok(baseConfig.includes('${MYSQL_DATABASE:dogadmin}'));
+  assert.ok(baseConfig.includes('sm2-private-key: ${API_ENCRYPT_PRIVATE_KEY}'), environment + ' SM2 private key must come from environment');
   assert.match(applicationConfig, /name: dog-admin/);
 }
 for (const filename of files.filter(filename => filename.endsWith('.xml'))) {
@@ -82,37 +85,51 @@ for (const filename of files.filter(filename => filename.endsWith('.xml'))) {
 assert.ok(fs.existsSync(path.join(web, 'src/theme/dogadmin.less')));
 assert.ok(fs.readFileSync(path.join(web, 'src/theme/index.less'), 'utf8').includes("'./dogadmin.less'"));
 assert.ok(fs.readFileSync(path.join(web, 'src/config/app-config.ts'), 'utf8').includes("websiteName: 'dogadmin'"));
-assert.equal(fs.readFileSync(path.join(root, 'mysql/admin.sql'), 'utf8').match(/^CREATE TABLE /gm).length, 23);
+assert.equal(fs.readFileSync(path.join(root, 'mysql/admin.sql'), 'utf8').match(/^CREATE TABLE /gm).length, 22);
 assert.ok(fs.statSync(path.join(api, 'dog-base/src/main/resources/ip2region.xdb')).size > 0);
 process.stdout.write('dogadmin identity, Java packages, mapper references and configuration checks passed.\n');
-const crypto = require('node:crypto');
 const vm = require('node:vm');
 const ts = require('typescript');
+const { sm2 } = require('sm-crypto');
+const SM2_CIPHER_MODE_C1C3C2 = 1;
+const PUBLIC_KEY_URL = '/login/getEncryptPublicKey';
+const apiEncryptDirectory = path.join(api, 'dog-base/src/main/java/net/dogadmin/base/module/support/apiencrypt/service');
 const encryptSource = fs.readFileSync(path.join(web, 'src/lib/encrypt.ts'), 'utf8');
-const protocolModule = { exports: {} };
-const protocolCode = ts.transpileModule(encryptSource + '\nexport const protocols = { AES, SM4, AES_KEY, SM4_KEY };', {
+assert.deepEqual(fs.readdirSync(apiEncryptDirectory).sort(), ['ApiEncryptService.java', 'ApiEncryptServiceSmImpl.java']);
+for (const source of [encryptSource, fs.readFileSync(path.join(apiEncryptDirectory, 'ApiEncryptServiceSmImpl.java'), 'utf8')]) {
+  assert.doesNotMatch(source, /dogadmindogadmin|_KEY = ['"]/, 'encryption keys must not be hardcoded');
+}
+const keyPair = sm2.generateKeyPairHex();
+const requestedUrls = [];
+const axiosStub = {
+  getRequest: async (url) => {
+    requestedUrls.push(url);
+    return { data: keyPair.publicKey };
+  },
+  request: async (config) => config,
+};
+const encryptModule = { exports: {} };
+const encryptCode = ts.transpileModule(encryptSource, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true },
 }).outputText;
-vm.runInNewContext(protocolCode, { module: protocolModule, exports: protocolModule.exports, require });
-const protocols = protocolModule.exports.protocols;
-const javaServices = [
-  { name: 'AES', file: 'ApiEncryptServiceAesImpl.java', keyName: 'AES_KEY', cipher: 'aes-128-ecb' },
-  { name: 'SM4', file: 'ApiEncryptServiceSmImpl.java', keyName: 'SM4_KEY', cipher: 'sm4-ecb' },
-];
-for (const service of javaServices) {
-  const javaSource = fs.readFileSync(path.join(api, 'dog-base/src/main/java/net/dogadmin/base/module/support/apiencrypt/service', service.file), 'utf8');
-  const backendKey = javaSource.match(new RegExp('private static final String ' + service.keyName + ' = "([^"]+)";'))?.[1];
-  const frontendKey = protocols[service.keyName];
-  assert.ok(backendKey === frontendKey, service.name + ' frontend and backend key mismatch');
-  assert.ok(Buffer.byteLength(frontendKey, 'utf8') === 16, service.name + ' key length mismatch');
-  assert.ok(crypto.getCiphers().includes(service.cipher), service.name + ' native cipher unavailable');
+vm.runInNewContext(encryptCode, {
+  module: encryptModule,
+  exports: encryptModule.exports,
+  require: (name) => (name === '/@/lib/axios' ? axiosStub : require(name)),
+});
+const { encryptData, postEncryptRequest } = encryptModule.exports;
+const decryptFrontendCipher = (cipher) => {
+  assert.ok(cipher.startsWith('04'), 'SM2 ciphertext must carry the uncompressed point prefix');
+  return sm2.doDecrypt(cipher.slice(2), keyPair.privateKey, SM2_CIPHER_MODE_C1C3C2);
+};
+(async () => {
   for (const value of ['dogadmin login', '中文密码验证', { loginName: 'admin', data: '地区与权限' }]) {
     const plain = typeof value === 'object' ? JSON.stringify(value) : value;
-    const nativeCipher = crypto.createCipheriv(service.cipher, Buffer.from(frontendKey, 'utf8'), null);
-    const encrypted = Buffer.concat([nativeCipher.update(plain, 'utf8'), nativeCipher.final()]);
-    const expected = service.name === 'AES' ? encrypted.toString('base64') : Buffer.from(encrypted.toString('hex'), 'utf8').toString('base64');
-    assert.ok(protocols[service.name].encryptData(value) === expected, service.name + ' ciphertext mismatch');
-    assert.ok(protocols[service.name].decryptData(expected) === plain, service.name + ' decrypt mismatch');
+    assert.equal(decryptFrontendCipher(await encryptData(value)), plain);
   }
-}
-process.stdout.write('AES and SM4 key pairing, Unicode round trips and native cipher format checks passed.\n');
+  assert.equal(await encryptData(''), null);
+  const posted = await postEncryptRequest('/employee/update/password', { oldPassword: '旧密码', newPassword: 'new' });
+  assert.equal(decryptFrontendCipher(posted.data.encryptData), JSON.stringify({ oldPassword: '旧密码', newPassword: 'new' }));
+  assert.ok(requestedUrls.length > 0 && requestedUrls.every((url) => url === PUBLIC_KEY_URL));
+  process.stdout.write('SM2 public key encryption, Unicode round trips and no hardcoded key checks passed.\n');
+})();

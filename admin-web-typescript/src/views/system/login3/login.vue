@@ -14,7 +14,6 @@
       <section class="form-panel" aria-labelledby="login-title">
         <div class="form-content">
           <h1 id="login-title">欢迎回来</h1>
-          <p class="form-description">登录账号，进入管理工作台。</p>
           <a-form
             ref="formRef"
             class="login-form"
@@ -34,6 +33,7 @@
                   <button
                     type="button"
                     class="password-toggle"
+                    tabindex="-1"
                     :aria-label="showPassword ? '隐藏密码' : '显示密码'"
                     :aria-pressed="showPassword"
                     @mousedown.prevent
@@ -62,7 +62,6 @@
             </a-form-item>
             <a-button class="login-button" type="primary" html-type="submit" :loading="isSubmitting">登录</a-button>
           </a-form>
-          <p class="form-footer">账号与权限由管理员统一管理。</p>
         </div>
       </section>
     </div>
@@ -136,7 +135,7 @@
     isSubmitting.value = true;
     try {
       DogLoading.show();
-      const encryptedForm = { ...loginForm, password: encryptData(loginForm.password) };
+      const encryptedForm = { ...loginForm, password: await encryptData(loginForm.password) };
       const res = await loginApi.login(encryptedForm);
       stopRefreshCaptchaTimer();
       localSave(LocalStorageKeyConst.USER_TOKEN, res.data.token || '');

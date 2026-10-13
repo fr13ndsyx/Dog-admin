@@ -8,9 +8,10 @@
         <Upload
             accept=".jpg,.jpeg,.png,.gif"
             :maxUploadSize="3"
-            buttonText="点击上传反馈图片"
+            buttonText="点击或拖拽图片到这里上传"
             :default-file-list="form.feedbackAttachment || []"
-            listType="picture-card"
+            listType="picture"
+            drag
             @change="changeAttachment"
             :folder="FILE_FOLDER_TYPE_ENUM.FEEDBACK.value"
         />

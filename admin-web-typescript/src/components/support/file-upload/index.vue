@@ -1,6 +1,7 @@
 <template>
   <div class="clearfix">
-    <a-upload
+    <component
+      :is="props.drag ? 'a-upload-dragger' : 'a-upload'"
       :multiple="props.multiple"
       :accept="props.accept"
       :before-upload="beforeUpload"
@@ -12,7 +13,12 @@
       @preview="handlePreview"
       @remove="handleRemove"
     >
-      <div v-if="fileList.length < props.maxUploadSize">
+      <template v-if="props.drag">
+        <p class="ant-upload-drag-icon"><InboxOutlined /></p>
+        <p class="ant-upload-text">{{ buttonText }}</p>
+        <p class="ant-upload-hint">{{ dragHint }}</p>
+      </template>
+      <div v-else-if="fileList.length < props.maxUploadSize">
         <template v-if="listType === 'picture-card'">
           <PlusOutlined />
           <div class="ant-upload-text">
@@ -26,7 +32,7 @@
           </a-button>
         </template>
       </div>
-    </a-upload>
+    </component>
     <a-modal :footer="null" :open="previewVisible" @cancel="handleCancel">
       <img :src="previewUrl" alt="example" style="width: 100%" />
     </a-modal>
@@ -82,6 +88,15 @@
       type: String,
       default: 'picture-card',
     },
+    drag: {
+      type: Boolean,
+      default: false,
+    },
+  });
+
+  const dragHint = computed(() => {
+    const formats = props.accept ? `支持 ${props.accept.replaceAll('.', '').replaceAll(',', '、')} 格式，` : '';
+    return `${formats}最多 ${props.maxUploadSize} 个，单个小于 ${props.maxSize}MB`;
   });
 
   // 图片类型的后缀名

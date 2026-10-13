@@ -18,4 +18,6 @@ public interface ApiEncryptService {
      */
     String encrypt(String data);
 
+    String getPublicKey();
+
 }

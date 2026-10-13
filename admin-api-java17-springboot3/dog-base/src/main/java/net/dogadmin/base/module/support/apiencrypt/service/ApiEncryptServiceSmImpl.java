@@ -1,105 +1,58 @@
 package net.dogadmin.base.module.support.apiencrypt.service;
 
-import cn.hutool.crypto.symmetric.SM4;
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.crypto.BCUtil;
+import cn.hutool.crypto.asymmetric.KeyType;
+import cn.hutool.crypto.asymmetric.SM2;
 import lombok.extern.slf4j.Slf4j;
 import net.dogadmin.base.common.constant.StringConst;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.security.Security;
-import java.util.Base64;
+import java.math.BigInteger;
 
 
 @Slf4j
 @Service
 public class ApiEncryptServiceSmImpl implements ApiEncryptService {
 
-    private static final String CHARSET = "UTF-8";
-    private static final String SM4_KEY = "dogadmindogadmin";
+    private final SM2 sm2;
 
-    static {
-        Security.addProvider(new BouncyCastleProvider());
+    private final String publicKey;
+
+    public ApiEncryptServiceSmImpl(@Value("${api-encrypt.sm2-private-key}") String privateKeyHex) {
+        ECPrivateKeyParameters privateKey = BCUtil.toSm2Params(privateKeyHex);
+        ECDomainParameters domain = privateKey.getParameters();
+        BigInteger d = privateKey.getD();
+        if (d.signum() <= 0 || d.compareTo(domain.getN()) >= 0) {
+            throw new IllegalArgumentException("API_ENCRYPT_PRIVATE_KEY 不是有效的 SM2 私钥");
+        }
+        ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(domain.getG().multiply(d).normalize(), domain);
+        this.sm2 = new SM2(privateKey, publicKeyParameters);
+        this.publicKey = HexUtil.encodeHexStr(publicKeyParameters.getQ().getEncoded(false));
     }
 
+    @Override
+    public String getPublicKey() {
+        return publicKey;
+    }
 
     @Override
     public String encrypt(String data) {
-        try {
-
-            // 第一步： SM4 加密
-            SM4 sm4 = new SM4(hexToBytes(stringToHex(SM4_KEY)));
-            String encryptHex = sm4.encryptHex(data);
-
-            // 第二步： Base64 编码
-            return new String(Base64.getEncoder().encode(encryptHex.getBytes(CHARSET)), CHARSET);
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return StringConst.EMPTY;
-        }
+        return sm2.encryptHex(data, KeyType.PublicKey);
     }
-
 
     @Override
     public String decrypt(String data) {
         try {
-
-            // 第一步： Base64 解码
-            byte[] base64Decode = Base64.getDecoder().decode(data);
-
-            // 第二步： SM4 解密
-            SM4 sm4 = new SM4(hexToBytes(stringToHex(SM4_KEY)));
-            return sm4.decryptStr(new String(base64Decode));
-
+            return sm2.decryptStr(data, KeyType.PrivateKey);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return StringConst.EMPTY;
         }
-    }
-
-
-    public static String stringToHex(String input) {
-        char[] chars = input.toCharArray();
-        StringBuilder hex = new StringBuilder();
-        for (char c : chars) {
-            hex.append(Integer.toHexString((int) c));
-        }
-        return hex.toString();
-    }
-
-
-    /**
-     * 16 进制串转字节数组
-     *
-     * @param hex 16进制字符串
-     * @return byte数组
-     */
-    public static byte[] hexToBytes(String hex) {
-        int length = hex.length();
-        byte[] result;
-        if (length % 2 == 1) {
-            length++;
-            result = new byte[(length / 2)];
-            hex = "0" + hex;
-        } else {
-            result = new byte[(length / 2)];
-        }
-        int j = 0;
-        for (int i = 0; i < length; i += 2) {
-            result[j] = hexToByte(hex.substring(i, i + 2));
-            j++;
-        }
-        return result;
-    }
-
-    /**
-     * 16 进制字符转字节
-     *
-     * @param hex 16进制字符 0x00到0xFF
-     * @return byte
-     */
-    private static byte hexToByte(String hex) {
-        return (byte) Integer.parseInt(hex, 16);
     }
 
 }

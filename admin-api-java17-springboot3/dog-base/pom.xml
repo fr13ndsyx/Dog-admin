@@ -187,16 +187,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.velocity.tools</groupId>
-            <artifactId>velocity-tools-generic</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>
         </dependency>

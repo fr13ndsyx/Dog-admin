@@ -1,5 +1,6 @@
 
-import { getRequest, postEncryptRequest, postRequest } from '/@/lib/axios';
+import { getRequest, postRequest } from '/@/lib/axios';
+import { postEncryptRequest } from '/@/lib/encrypt';
 
 export const employeeApi = {
   /**

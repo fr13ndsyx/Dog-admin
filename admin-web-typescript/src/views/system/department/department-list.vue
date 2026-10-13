@@ -26,11 +26,42 @@
           </template>
           新建一级部门
         </a-button>
+        <a-radio-group v-model:value="viewMode" button-style="solid" class="dog-margin-left20">
+          <a-radio-button :value="VIEW_MODE_TABLE">表格</a-radio-button>
+          <a-radio-button :value="VIEW_MODE_CANVAS">画布</a-radio-button>
+        </a-radio-group>
       </a-form-item>
     </a-row>
   </a-form>
 
-  <a-card size="small" :bordered="true">
+  <OrgCanvas v-if="viewMode === VIEW_MODE_CANVAS" class="org-canvas" :tree="orgTree" :selected-id="selectedOrgNodeId" @select="selectOrgNode">
+    <template #tl>
+      <section v-if="selectedOrgNode" class="pg-org-card pg-float">
+        <span class="pg-eyebrow">已选部门</span>
+        <h2 class="pg-org-card-title">{{ selectedOrgNode.name }}</h2>
+        <dl class="pg-org-card-rows">
+          <dt>负责人</dt>
+          <dd>{{ selectedOrgNode.leader || '未设负责人' }}</dd>
+          <dt>本部门</dt>
+          <dd>{{ selectedOrgNode.memberCount ?? 0 }} 人</dd>
+          <dt>下级部门</dt>
+          <dd>{{ selectedOrgNode.children?.length ?? 0 }} 个</dd>
+        </dl>
+        <span class="pg-eyebrow org-members-title">部门人员</span>
+        <ul class="pg-org-members org-members-list" @wheel.stop>
+          <li v-if="membersLoading" class="faint">加载中…</li>
+          <li v-else-if="!selectedMembers.length" class="faint">暂无人员</li>
+          <li v-for="member in selectedMembers" v-else :key="member.employeeId" :class="{ 'is-disabled': member.disabledFlag }">
+            <span class="org-member-avatar" aria-hidden="true">{{ member.actualName.slice(0, 1) }}</span>
+            <span class="org-member-name">{{ member.actualName }}</span>
+            <span class="org-member-meta">{{ member.disabledFlag ? '已禁用' : member.phone || '' }}</span>
+          </li>
+        </ul>
+      </section>
+      <section v-else class="pg-org-card pg-float org-canvas-hint">点击部门查看人员；拖动空白处平移，Ctrl + 滚轮缩放。</section>
+    </template>
+  </OrgCanvas>
+  <a-card v-else size="small" :bordered="true">
     <a-table
       size="small"
       bordered
@@ -58,29 +89,105 @@
         </template>
       </template>
     </a-table>
-    <!-- 添加编辑部门弹窗 -->
-    <DepartmentFormModal ref="departmentFormModal" @refresh="queryDepartmentTree" />
   </a-card>
+  <DepartmentFormModal ref="departmentFormModal" @refresh="queryDepartmentTree" />
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref, createVNode } from 'vue';
+  import { computed, onMounted, ref, createVNode, watch } from 'vue';
   import { departmentApi } from '/@/api/system/department-api';
+  import { employeeApi } from '/@/api/system/employee-api';
   import { Modal } from 'ant-design-vue';
   import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
   import _ from 'lodash';
   import { DogLoading } from '/@/components/framework/dog-loading';
   import DepartmentFormModal from './components/department-form-modal.vue';
+  import OrgCanvas from './components/pearl-visuals/OrgCanvas.vue';
+  import type { OrgNode } from './components/pearl-visuals/types';
   import { dogSentry } from '/@/lib/dog-sentry';
 
   interface Department {
     departmentId: number;
     departmentName: string;
     parentId: number;
+    managerName?: string;
     children?: Department[];
   }
 
+  interface DepartmentMember {
+    employeeId: number;
+    actualName: string;
+    phone?: string;
+    disabledFlag: boolean;
+  }
+
   const DEPARTMENT_PARENT_ID = 0;
+  const VIEW_MODE_TABLE = 'table';
+  const VIEW_MODE_CANVAS = 'canvas';
+
+  const viewMode = ref<typeof VIEW_MODE_TABLE | typeof VIEW_MODE_CANVAS>(VIEW_MODE_TABLE);
+  const selectedOrgNodeId = ref<number | null>(null);
+  const memberCountByDepartmentId = ref<Record<string, number>>({});
+  const orgTree = computed<OrgNode[]>(() => departmentTreeData.value.map(toOrgNode));
+  const selectedOrgNode = computed<OrgNode | undefined>(() => findOrgNode(orgTree.value, selectedOrgNodeId.value));
+  const selectedMembers = ref<DepartmentMember[]>([]);
+  const membersLoading = ref(false);
+
+  function findOrgNode(nodes: OrgNode[], id: number | null): OrgNode | undefined {
+    for (const node of nodes) {
+      if (node.id === id) {
+        return node;
+      }
+      const child = findOrgNode(node.children ?? [], id);
+      if (child) {
+        return child;
+      }
+    }
+    return undefined;
+  }
+
+  async function selectOrgNode(node: OrgNode): Promise<void> {
+    selectedOrgNodeId.value = node.id;
+    selectedMembers.value = [];
+    membersLoading.value = true;
+    try {
+      const res = await employeeApi.queryEmployeeByDeptId(node.id);
+      if (selectedOrgNodeId.value === node.id) {
+        selectedMembers.value = res.data;
+      }
+    } catch (e) {
+      dogSentry.captureError(e);
+    } finally {
+      if (selectedOrgNodeId.value === node.id) {
+        membersLoading.value = false;
+      }
+    }
+  }
+
+  function toOrgNode(department: Department): OrgNode {
+    return {
+      id: department.departmentId,
+      name: department.departmentName,
+      leader: department.managerName,
+      memberCount: memberCountByDepartmentId.value[department.departmentId] ?? 0,
+      children: department.children?.map(toOrgNode),
+    };
+  }
+
+  async function queryMemberCount(): Promise<void> {
+    try {
+      const res = await employeeApi.queryAll();
+      memberCountByDepartmentId.value = _.countBy(res.data, 'departmentId');
+    } catch (e) {
+      dogSentry.captureError(e);
+    }
+  }
+
+  watch(viewMode, (mode) => {
+    if (mode === VIEW_MODE_CANVAS) {
+      queryMemberCount();
+    }
+  });
 
   // -----------------------  筛选 ---------------------
   const keywords = ref('');
@@ -256,4 +363,68 @@
   }
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+  .org-canvas {
+    :deep([class*='pg-cat-']) {
+      --pg-cat-bg: var(--pg-cat-2-bg);
+      --pg-cat-ink: var(--pg-cat-2-ink);
+    }
+    :deep(.pg-org-node.is-root) {
+      background: var(--pg-surface);
+      color: var(--pg-ink);
+    }
+    :deep(.pg-org-node.is-root:not(.is-selected)) {
+      border-color: var(--pg-line-strong);
+    }
+    :deep(.pg-org-node.is-root .pg-org-meta) {
+      color: var(--pg-ink-soft);
+    }
+    :deep(.pg-org-node.is-root .pg-org-strip) {
+      background: var(--pg-cat-bg);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pg-cat-ink) 30%, transparent);
+    }
+  }
+  .org-members-title {
+    margin-top: 10px;
+  }
+  .org-members-list {
+    max-height: 240px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    .faint {
+      color: var(--pg-ink-faint);
+    }
+    .is-disabled {
+      opacity: 0.55;
+    }
+  }
+  .org-member-avatar {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pg-blue);
+    background: var(--pg-blue-soft);
+  }
+  .org-member-name {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .org-member-meta {
+    overflow: hidden;
+    color: var(--pg-ink-soft);
+    font-family: var(--pg-font-mono);
+    font-size: 11.5px;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .org-canvas-hint {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--pg-ink-soft);
+  }
+</style>

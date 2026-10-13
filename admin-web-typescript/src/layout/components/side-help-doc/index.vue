@@ -1,8 +1,7 @@
 <template>
-  <a-card class="home-help-doc" title="帮助文档" :bordered="false">
+  <a-card v-if="loadFailed || helpDocs.length" class="home-help-doc" title="帮助文档" :bordered="false">
     <template #extra>
       <a-space>
-        <a-button type="link" @click="feedbackModal?.show()">意见反馈</a-button>
         <router-link target="_blank" rel="noopener noreferrer" :to="{ path: '/help-doc/detail' }">全部文档</router-link>
         <a-button type="link" :loading="loading" @click="queryHelpDocs">刷新</a-button>
       </a-space>
@@ -22,13 +21,11 @@
       </template>
     </a-list>
   </a-card>
-  <FeedbackModal ref="feedbackModal" />
 </template>
 <script setup lang="ts">
   import { onActivated, onMounted, ref } from 'vue';
   import { helpDocApi } from '/@/api/support/help-doc-api';
   import { dogSentry } from '/@/lib/dog-sentry';
-  import FeedbackModal from './components/feedback-modal.vue';
 
   interface HelpDoc {
     helpDocId: number;
@@ -37,7 +34,6 @@
 
   const HOME_HELP_DOC_PAGE_SIZE = 5;
   const helpDocs = ref<HelpDoc[]>([]);
-  const feedbackModal = ref<InstanceType<typeof FeedbackModal>>();
   const loading = ref(false);
   const loadFailed = ref(false);
 

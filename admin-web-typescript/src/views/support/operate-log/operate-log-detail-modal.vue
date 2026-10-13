@@ -1,7 +1,7 @@
 <template>
   <a-modal :open="visible" title="请求详情" width="60%" :footer="null" @cancel="close">
     <div class="info-box">
-      <a-row class="dog-margin-top10">
+      <a-row class="margin-top10">
         <a-col :span="16">
           <a-row class="detail-info">
             <a-col :span="12"> 用户id：{{ detail.operateUserId }}</a-col>
@@ -54,8 +54,8 @@
   import { reactive, ref } from 'vue';
   import { JsonViewer } from 'vue3-json-viewer';
   import { operateLogApi } from '/@/api/support/operate-log-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { sentry } from '/@/lib/sentry';
+  import { Loading } from '/@/components/framework/loading';
   import uaparser from 'ua-parser-js';
 
   defineExpose({
@@ -90,7 +90,7 @@
 
   async function getDetail(operateLogId) {
     try {
-      DogLoading.show();
+      Loading.show();
       let res = await operateLogApi.detail(operateLogId);
       detail = Object.assign(detail, res.data);
       let ua = uaparser(res.data.userAgent);
@@ -98,9 +98,9 @@
       detail.os = ua.os.name;
       detail.device = ua.device.vendor ? ua.device.vendor + ua.device.model : '';
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 </script>

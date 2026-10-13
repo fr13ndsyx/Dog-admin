@@ -5,7 +5,7 @@
       2、中间内容区域
       3、底部（一般是公司版权信息）
      -->
-  <a-layout class="help-doc-layout" id="dogadminMain">
+  <a-layout class="help-doc-layout" id="adminMain">
     <!-- 顶部头部信息 -->
     <a-layout-header class="layout-header">
       <a-row class="layout-header-title">
@@ -33,7 +33,7 @@
       </a-layout-sider>
 
       <!--中间内容-->
-      <a-layout-content id="dogadminLayoutContent" class="help-doc-layout-content">
+      <a-layout-content id="adminLayoutContent" class="help-doc-layout-content">
         <router-view v-slot="{ Component }">
           <div :key="route.fullPath">
             <component :is="Component" />
@@ -50,13 +50,13 @@
   import _ from 'lodash';
   import { computed, onMounted, ref } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { dogSentry } from '../lib/dog-sentry';
+  import { sentry } from '../lib/sentry';
   import { useAppConfigStore } from '../store/modules/system/app-config';
   import { helpDocApi } from '/@/api/support/help-doc-api';
   import { helpDocCatalogApi } from '/@/api/support/help-doc-catalog-api';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import { HOME_PAGE_NAME } from '/@/constants/system/home-const';
-  import watermark from '../lib/dog-watermark';
+  import watermark from '../lib/watermark';
   import { useUserStore } from '/@/store/modules/system/user';
   import HeaderAvatar from './components/header-user-space/header-avatar.vue';
   import { LAYOUT_ELEMENT_IDS } from '/@/layout/layout-const';
@@ -127,7 +127,7 @@
   const HELP_DOC_CATALOG_PARENT_ID = 0;
   //查询帮助文档树形结构
   async function queryHelpDocTree() {
-    DogLoading.show();
+    Loading.show();
     try {
       let { data: catalogList } = await helpDocCatalogApi.getAll();
       let { data: helpDocList } = await helpDocApi.getAllHelpDocList();
@@ -158,9 +158,9 @@
       //更新展开节点
       updateExpandedKeys(route.query.helpDocId, helpDocList, catalogList);
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 
@@ -273,4 +273,4 @@
   }
 
 </style>
-../lib/dog-watermark
+../lib/watermark

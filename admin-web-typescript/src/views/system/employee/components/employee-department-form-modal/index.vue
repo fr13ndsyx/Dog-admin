@@ -13,8 +13,8 @@
   import { ref } from 'vue';
   import DepartmentTree from '../department-tree/index.vue';
   import { employeeApi } from '/@/api/system/employee-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { sentry } from '/@/lib/sentry';
+  import { Loading } from '/@/components/framework/loading';
 
   // ----------------------- 以下是字段定义 emits props ---------------------
 
@@ -39,7 +39,7 @@
 
   // ----------------------- form操作 ---------------------------------
   async function handleOk() {
-    DogLoading.show();
+    Loading.show();
     try {
       if (_.isEmpty(employeeIdList.value)) {
         message.warning('请选择要调整的员工');
@@ -59,9 +59,9 @@
       emit('refresh');
       closeModal();
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 

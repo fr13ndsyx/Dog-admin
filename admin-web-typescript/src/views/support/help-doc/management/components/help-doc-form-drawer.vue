@@ -58,14 +58,14 @@
   import { nextTick, reactive, ref } from 'vue';
   import { message } from 'ant-design-vue';
   import _ from 'lodash';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import { FILE_FOLDER_TYPE_ENUM } from '/@/constants/support/file-const';
   import { helpDocApi } from '/@/api/support/help-doc-api';
   import Wangeditor from '/@/components/framework/wangeditor/index.vue';
   import Upload from '/@/components/support/file-upload/index.vue';
   import HelpDocCatalogTreeSelect from './help-doc-catalog-tree-select.vue';
   import MenuTreeSelect from '/@/components/system/menu-tree-select/index.vue';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   const emits = defineEmits(['reloadList']);
 
@@ -121,7 +121,7 @@
   // 查询详情
   async function getDetail(helpDocId) {
     try {
-      DogLoading.show();
+      Loading.show();
       const result = await helpDocApi.getDetail(helpDocId);
       const attachment = result.data.attachment;
       if (!_.isEmpty(attachment)) {
@@ -137,9 +137,9 @@
         relateHomeFlag.value = false;
       }
     } catch (err) {
-      dogSentry.captureError(err);
+      sentry.captureError(err);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 
@@ -160,7 +160,7 @@
 
   async function save() {
     try {
-      DogLoading.show();
+      Loading.show();
       let param = _.cloneDeep(formData);
       // 首页显示的话，为0
       if (relateHomeFlag.value) {
@@ -184,9 +184,9 @@
       emits('reloadList');
       onClose();
     } catch (err) {
-      dogSentry.captureError(err);
+      sentry.captureError(err);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 

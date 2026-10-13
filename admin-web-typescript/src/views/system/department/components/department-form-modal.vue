@@ -25,8 +25,8 @@
   import { departmentApi } from '/@/api/system/department-api';
   import DepartmentTreeSelect from '/@/components/system/department-tree-select/index.vue';
   import EmployeeSelect from '/@/components/system/employee-select/index.vue';
-  import { dogSentry } from '/@/lib/dog-sentry';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { sentry } from '/@/lib/sentry';
+  import { Loading } from '/@/components/framework/loading';
 
 // ----------------------- 对外暴漏 ---------------------
 
@@ -114,21 +114,21 @@ function resetFormData() {
   // ----------------------- form 表单  ajax 操作 ---------------------
   //添加部门ajax请求
   async function addDepartment() {
-    DogLoading.show();
+    Loading.show();
     try {
       await departmentApi.addDepartment(formState);
       emits('refresh');
       closeModal();
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 
   //更新部门ajax请求
   async function updateDepartment() {
-    DogLoading.show();
+    Loading.show();
     try {
       if (formState.parentId == formState.departmentId) {
         message.warning('上级菜单不能为自己');
@@ -138,9 +138,9 @@ function resetFormData() {
       emits('refresh');
       closeModal();
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 </script>

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { appDefaultConfig } from '/@/config/app-config';
 import localStorageKeyConst from '/@/constants/local-storage-key-const';
-import { dogSentry } from '/@/lib/dog-sentry';
+import { sentry } from '/@/lib/sentry';
 import { AppConfig } from '/@/types/config';
 import { localRead } from '/@/utils/local-util';
 
@@ -16,11 +16,11 @@ if (appConfigStr) {
     state = { ...appDefaultConfig, ...JSON.parse(appConfigStr) };
     language = state.language;
   } catch (e) {
-    dogSentry.captureError(e);
+    sentry.captureError(e);
   }
 }
 
-if (typeof state.websiteName === 'string' && /^dogadmin\b/i.test(state.websiteName.trim())) {
+if (typeof state.websiteName === 'string' && /^admin\b/i.test(state.websiteName.trim())) {
   state.websiteName = appDefaultConfig.websiteName;
 }
 state.layout = 'side';

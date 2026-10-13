@@ -40,8 +40,8 @@ async function main() {
   const memberRequests = new Map();
   const sentryErrors = [];
   const support = {
-    '/@/lib/dog-sentry': { dogSentry: { captureError: error => sentryErrors.push(error) } },
-    '/@/components/framework/dog-loading': { DogLoading: { show: () => {}, hide: () => {} } },
+    '/@/lib/sentry': { sentry: { captureError: error => sentryErrors.push(error) } },
+    '/@/components/framework/loading': { Loading: { show: () => {}, hide: () => {} } },
     '/@/api/system/department-api': { departmentApi: { queryAllDepartment: async () => ({ data: departments }) } },
   };
   const list = loadComponent('src/views/system/department/department-list.vue', {
@@ -122,7 +122,7 @@ async function main() {
       requests.push(params);
       return failure ? Promise.reject(Error('network')) : new Promise(resolve => { finish = resolve; });
     } } },
-    '/@/lib/dog-sentry': support['/@/lib/dog-sentry'],
+    '/@/lib/sentry': support['/@/lib/sentry'],
     '../../support/change-log/change-log-modal.vue': {},
     '/@/layout/components/side-help-doc/index.vue': {},
     '/@/layout/components/side-help-doc/components/feedback-modal.vue': {},
@@ -184,7 +184,7 @@ async function main() {
       documentRequests++;
       return documentFailure ? Promise.reject(Error('documents network')) : new Promise(resolve => { finishDocuments = resolve; });
     } } },
-    '/@/lib/dog-sentry': support['/@/lib/dog-sentry'],
+    '/@/lib/sentry': support['/@/lib/sentry'],
   });
   const initialDocuments = documents.mounted[0]();
   await documents.activated[0]();
@@ -244,7 +244,7 @@ async function main() {
   assert.equal(tabRoutes[0].name, 'Home');
   assert.match(tabs.descriptor.template.content, /contextmenu/);
   assert.equal((tabs.descriptor.template.content.match(/<a-dropdown/g) || []).length, 1);
-  assert.doesNotMatch(tabs.descriptor.template.content, /AppstoreOutlined|dog-page-tag-operate/);
+  assert.doesNotMatch(tabs.descriptor.template.content, /AppstoreOutlined|page-tag-operate/);
   for (const descriptor of [home.descriptor, documents.descriptor, login]) {
     assert.doesNotMatch(descriptor.styles.map(style => style.content).join('\n'), /@media[^{]*(?:min|max)-width/);
   }

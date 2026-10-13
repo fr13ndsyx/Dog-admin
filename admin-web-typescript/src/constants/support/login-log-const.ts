@@ -1,7 +1,7 @@
 
-import { DogEnum } from '/@/types/dog-enum';
+import { Enum } from '/@/types/enum';
 
-export const LOGIN_RESULT_ENUM: DogEnum<number> = {
+export const LOGIN_RESULT_ENUM: Enum<number> = {
   LOGIN_SUCCESS: {
     value: 0,
     desc: '登录成功',

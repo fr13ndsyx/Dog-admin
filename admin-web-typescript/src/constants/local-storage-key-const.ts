@@ -2,7 +2,7 @@
 /**
  * key前缀
  */
-const KEY_PREFIX = 'dogadmin_';
+const KEY_PREFIX = 'admin_';
 /**
  * localStorageKey集合
  */

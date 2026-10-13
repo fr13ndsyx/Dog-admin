@@ -82,9 +82,9 @@
   import MenuLocationBreadcrumb from './components/menu-location-breadcrumb/index.vue';
   import PageTag from './components/page-tag/index.vue';
   import SideMenu from './components/side-menu/index.vue';
-  import { dogKeepAlive } from './components/dog-keep-alive';
+  import { keepAlive } from './components/keep-alive';
   import IframeIndex from '/@/components/framework/iframe/iframe-index.vue';
-  import watermark from '../lib/dog-watermark';
+  import watermark from '../lib/watermark';
   import { useUserStore } from '/@/store/modules/system/user';
   import { useRouter } from 'vue-router';
   import { HOME_PAGE_NAME } from '/@/constants/system/home-const';
@@ -153,7 +153,7 @@
   onUnmounted(() => window.removeEventListener('resize', updateWindowHeight));
 
   // ----------------------- keep-alive相关 -----------------------
-  let { route, keepAliveIncludes, iframeNotKeepAlivePageFlag, keepAliveIframePages } = dogKeepAlive();
+  let { route, keepAliveIncludes, iframeNotKeepAlivePageFlag, keepAliveIframePages } = keepAlive();
 
   const { useToken } = antDesignTheme;
   const { token } = useToken();

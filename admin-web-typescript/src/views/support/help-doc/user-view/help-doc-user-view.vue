@@ -21,7 +21,7 @@
     <div v-if="helpDocDetail.attachment && helpDocDetail.attachment.length > 0">附件：<FilePreview :fileList="helpDocDetail.attachment" /></div>
   </a-card>
 
-  <a-card title="阅读记录" size="small" class="dog-margin-top10" :bordered="false">
+  <a-card title="阅读记录" size="small" class="margin-top10" :bordered="false">
     <HelpDocViewRecordList ref="helpDocViewRecordListRef" :helpDocId="route.query.helpDocId" />
   </a-card>
 
@@ -34,9 +34,9 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import HelpDocViewRecordList from './components/help-doc-view-record-list.vue';
 import { helpDocApi } from '/@/api/support/help-doc-api';
-import { DogLoading } from '/@/components/framework/dog-loading';
+import { Loading } from '/@/components/framework/loading';
 import FilePreview from '/@/components/support/file-preview/index.vue';
-import { dogSentry } from '/@/lib/dog-sentry';
+import { sentry } from '/@/lib/sentry';
 
 const route = useRoute();
 
@@ -55,15 +55,15 @@ const helpDocViewRecordListRef = ref();
 // 查询详情
 async function queryHelpDocDetail() {
   try {
-    DogLoading.show();
+    Loading.show();
     const result = await helpDocApi.view(route.query.helpDocId);
     helpDocDetail.value = result.data;
 
     helpDocViewRecordListRef.value.onSearch();
   } catch (err) {
-    dogSentry.captureError(err);
+    sentry.captureError(err);
   } finally {
-    DogLoading.hide();
+    Loading.hide();
   }
 }
 

@@ -21,7 +21,7 @@
         <template #icon><setting-outlined /></template>
       </a-button>
     </a-tooltip>
-    <DogTableColumnModal ref="dogTableColumnModal" @change="updateColumn" />
+    <TableColumnModal ref="tableColumnModal" @change="updateColumn" />
   </span>
 </template>
 
@@ -29,10 +29,10 @@
   import _ from 'lodash';
   import { tableColumnApi } from '/@/api/support/table-column-api';
   import { onMounted, ref, watch, reactive } from 'vue';
-  import DogTableColumnModal from './dog-table-column-modal.vue';
+  import TableColumnModal from './table-column-modal.vue';
   import { message } from 'ant-design-vue';
-  import { mergeColumn } from './dog-table-column-merge';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { mergeColumn } from './table-column-merge';
+  import { sentry } from '/@/lib/sentry';
   import { useAppConfigStore } from '/@/store/modules/system/app-config';
 
   const props = defineProps({
@@ -92,11 +92,11 @@
         try {
           userTableColumnArray = JSON.parse(res.data);
         } catch (e1) {
-          dogSentry.captureError(e1);
+          sentry.captureError(e1);
         }
       }
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     }
     updateColumn(userTableColumnArray);
   }
@@ -118,7 +118,7 @@
 
   // 处理退出全屏
   function handleExitFullScreen() {
-    document.querySelector('#dogadminHeader').style.display = 'block';
+    document.querySelector('#adminHeader').style.display = 'block';
     fullScreenFlag.value = false;
     useAppConfigStore().exitFullScreen();
     document.removeEventListener('fullscreenchange', handleFullscreenChange);
@@ -129,7 +129,7 @@
 
   //判断各种浏览器 -全屏
   function launchElementFullScreen(element) {
-    document.querySelector('#dogadminHeader').style.display = 'none';
+    document.querySelector('#adminHeader').style.display = 'none';
     if (element.requestFullscreen) {
       element.requestFullscreen();
     } else if (element.mozRequestFullScreen) {
@@ -171,10 +171,10 @@
 
   // ----------------- 弹窗 修改表格列 -------------------
 
-  const dogTableColumnModal = ref();
+  const tableColumnModal = ref();
 
   function showModal() {
-    dogTableColumnModal.value.show(newColumn, props.tableId);
+    tableColumnModal.value.show(newColumn, props.tableId);
   }
 
   // 将弹窗修改的列数据，赋值给原表格 列数组

@@ -1,4 +1,4 @@
-import { DogEnumPlugin } from '/@/types/dog-enum';
+import { EnumPlugin } from '/@/types/enum';
 import * as lodash from 'lodash';
 
 declare module '*.vue' {
@@ -11,7 +11,7 @@ declare module '*.vue' {
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     // 常量插件
-    $dogEnumPlugin: DogEnumPlugin;
+    $enumPlugin: EnumPlugin;
     // 常量图标
     $antIcons: Object;
     // lodash工具类

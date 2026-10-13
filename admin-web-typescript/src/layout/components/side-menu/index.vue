@@ -3,8 +3,8 @@
 
   <!-- 1、顶部logo区域 -->
   <div class="logo" @click="onGoHome" :style="sideMenuWidth" v-if="!collapsed">
-    <div class="title dog-logo title-light" v-if="sideMenuTheme === 'light'">{{ websiteName }}</div>
-    <div class="title dog-logo title-dark" v-if="sideMenuTheme === 'dark'">{{ websiteName }}</div>
+    <div class="title logo title-light" v-if="sideMenuTheme === 'light'">{{ websiteName }}</div>
+    <div class="title logo title-dark" v-if="sideMenuTheme === 'dark'">{{ websiteName }}</div>
   </div>
   <div class="min-logo" @click="onGoHome" v-if="collapsed">
     <HomeOutlined class="home-icon" aria-label="首页" />

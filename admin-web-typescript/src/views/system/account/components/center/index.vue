@@ -25,7 +25,7 @@
               <a-input class="form-item" v-model:value.trim="form.actualName" placeholder="请输入员工名称" />
             </a-form-item>
             <a-form-item label="性别" name="gender">
-              <dog-enum-select class="form-item" v-model:value="form.gender" placeholder="请选择性别" enum-name="GENDER_ENUM" />
+              <enum-select class="form-item" v-model:value="form.gender" placeholder="请选择性别" enum-name="GENDER_ENUM" />
             </a-form-item>
             <a-form-item label="手机号码" name="phone">
               <a-input class="form-item" v-model:value.trim="form.phone" placeholder="请输入手机号码" />
@@ -75,13 +75,13 @@
   import { onMounted, reactive, ref } from 'vue';
   import { regular } from '/@/constants/regular-const';
   import DepartmentTreeSelect from '/@/components/system/department-tree-select/index.vue';
-  import DogEnumSelect from '/@/components/framework/dog-enum-select/index.vue';
+  import EnumSelect from '/@/components/framework/enum-select/index.vue';
   import { loginApi } from '/@/api/system/login-api';
   import { useUserStore } from '/@/store/modules/system/user';
   import { message } from 'ant-design-vue';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import { employeeApi } from '/@/api/system/employee-api';
-  import { DogLoading } from '/@/components/framework/dog-loading/index';
+  import { Loading } from '/@/components/framework/loading/index';
   import { fileApi } from '/@/api/support/file-api';
   import { FILE_FOLDER_TYPE_ENUM } from '/@/constants/support/file-const';
   import { defaultAvatar, showDefaultAvatar } from '/@/lib/avatar';
@@ -148,7 +148,7 @@
       // 头像展示
       avatarUrl.value = data.avatar || defaultAvatar;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     }
   }
 
@@ -188,7 +188,7 @@
       // 重新获取详情，刷新整体缓存
       await getLoginInfo();
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       updateAvatarLoading.value = false;
     }
@@ -196,16 +196,16 @@
 
   // 更新员工信息
   async function updateEmployee() {
-    DogLoading.show();
+    Loading.show();
     try {
       await employeeApi.updateCenter(form);
       message.success('更新成功');
       // 重新获取详情，刷新整体缓存
       await getLoginInfo();
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 

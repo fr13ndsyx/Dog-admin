@@ -1,11 +1,11 @@
 <template>
-  <a-form class="dog-query-form" ref="queryFormRef">
-    <a-row class="dog-query-form-row">
-      <a-form-item label="时间" class="dog-query-form-item">
+  <a-form class="query-form" ref="queryFormRef">
+    <a-row class="query-form-row">
+      <a-form-item label="时间" class="query-form-item">
         <a-range-picker @change="changeCreateDate" v-model:value="createDateRange" :presets="defaultChooseTimeRange" style="width: 240px" />
       </a-form-item>
 
-      <a-form-item class="dog-query-form-item dog-margin-left10">
+      <a-form-item class="query-form-item margin-left10">
         <a-button-group>
           <a-button type="primary" @click="onSearch">
             <template #icon>
@@ -43,7 +43,7 @@
     </template>
   </a-table>
 
-  <div class="dog-query-table-page">
+  <div class="query-table-page">
     <a-pagination
       showSizeChanger
       showQuickJumper
@@ -65,7 +65,7 @@
   import uaparser from 'ua-parser-js';
   import { LOGIN_RESULT_ENUM } from '/@/constants/support/login-log-const';
   import { loginLogApi } from '/@/api/support/login-log-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import { calcTableHeight } from '/@/lib/table-auto-height';
 
   const columns = ref([
@@ -155,7 +155,7 @@
       total.value = responseModel.data.total;
       tableData.value = list;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       tableLoading.value = false;
     }

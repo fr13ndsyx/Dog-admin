@@ -1,7 +1,7 @@
 
-import { DogEnum } from '/@/types/dog-enum';
+import { Enum } from '/@/types/enum';
 
-export const GENDER_ENUM: DogEnum<number> = {
+export const GENDER_ENUM: Enum<number> = {
   UNKNOWN: {
     value: 0,
     desc: '未知',

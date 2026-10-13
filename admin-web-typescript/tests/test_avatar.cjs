@@ -6,7 +6,7 @@ const ts = require('typescript');
 const vue = require('vue');
 const { parse, compileScript, compileTemplate } = require('@vue/compiler-sfc');
 const root = path.resolve(__dirname, '..');
-const defaultUrl = '/admin/assets/wechat-icon.png';
+const defaultUrl = '/admin/assets/default-avatar.svg';
 
 function loadScript(source, imports) {
   const module = { exports: {} };
@@ -25,10 +25,10 @@ function loadScript(source, imports) {
 }
 
 const helper = loadScript(fs.readFileSync(path.join(root, 'src/lib/avatar.ts'), 'utf8'), {
-  '/@/assets/images/wechat-icon.png': { default: defaultUrl },
+  '/@/assets/images/default-avatar.svg': { default: defaultUrl },
 });
 assert.equal(helper.defaultAvatar, defaultUrl);
-assert.ok(fs.statSync(path.join(root, 'src/assets/images/wechat-icon.png')).size > 0);
+assert.match(fs.readFileSync(path.join(root, 'src/assets/images/default-avatar.svg'), 'utf8'), /^<svg [^>]*viewBox="0 0 128 128"/);
 
 function avatarNode(node) {
   if (node.tag === 'img' && node.props.some((prop) => prop.name === 'class' && prop.value?.content === 'avatar-image')) return node;

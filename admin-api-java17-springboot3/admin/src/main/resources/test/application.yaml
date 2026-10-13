@@ -1,0 +1,10 @@
+project:
+  name: admin
+  log-directory: ${LOG_DIRECTORY:./runtime/logs}/${project.name}/${spring.profiles.active}
+server:
+  port: 1024
+  servlet:
+    context-path: /
+spring:
+  profiles:
+    active: '@profiles.active@'

@@ -76,11 +76,11 @@
   import { useRouter } from 'vue-router';
   import AnimatedCharacters from './AnimatedCharacters.vue';
   import { loginApi } from '/@/api/system/login-api';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import { LOGIN_DEVICE_ENUM } from '/@/constants/system/login-device-const';
   import { useUserStore } from '/@/store/modules/system/user';
   import { buildRoutes } from '/@/router/index';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import { encryptData } from '/@/lib/encrypt';
   import { localSave } from '/@/utils/local-util';
   import LocalStorageKeyConst from '/@/constants/local-storage-key-const';
@@ -134,7 +134,7 @@
     if (isSubmitting.value) return;
     isSubmitting.value = true;
     try {
-      DogLoading.show();
+      Loading.show();
       const encryptedForm = { ...loginForm, password: await encryptData(loginForm.password) };
       const res = await loginApi.login(encryptedForm);
       stopRefreshCaptchaTimer();
@@ -148,10 +148,10 @@
     } catch (error) {
       loginForm.captchaCode = '';
       await getCaptcha();
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
       isSubmitting.value = false;
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 
@@ -170,7 +170,7 @@
       const delay = Math.max(1, result.data.expireSeconds - CAPTCHA_REFRESH_BUFFER_SECONDS) * SECOND_MS;
       refreshCaptchaTimer = window.setTimeout(() => { void getCaptcha(); }, delay);
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     }
   }
 
@@ -197,7 +197,7 @@
       const result = await loginApi.getTwoFactorLoginFlag();
       if (active) emailCodeShowFlag.value = result.data;
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     }
   }
 
@@ -209,15 +209,15 @@
       return;
     }
     try {
-      DogLoading.show();
+      Loading.show();
       await loginApi.sendLoginEmailCode(loginForm.loginName);
       if (!active) return;
       message.success('验证码已发送，请查看邮箱');
       runCountDown();
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 

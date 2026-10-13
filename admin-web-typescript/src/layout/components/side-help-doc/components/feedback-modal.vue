@@ -25,12 +25,12 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { DogLoading } from '/@/components/framework/dog-loading';
+import { Loading } from '/@/components/framework/loading';
 import { feedbackApi } from '/@/api/support/feedback-api';
 import { message } from 'ant-design-vue';
 import { FILE_FOLDER_TYPE_ENUM } from '/@/constants/support/file-const';
 import Upload from '/@/components/support/file-upload/index.vue';
-import { dogSentry } from '/@/lib/dog-sentry';
+import { sentry } from '/@/lib/sentry';
 
 defineExpose({
   show,
@@ -56,7 +56,7 @@ const form = reactive({ ...formDefault });
 
 async function submit () {
   try {
-    DogLoading.show();
+    Loading.show();
     if(!form.feedbackContent){
       message.warn('请填写具体内容');
       return;
@@ -65,9 +65,9 @@ async function submit () {
     message.success('提交成功');
     hide();
   } catch (e) {
-    dogSentry.captureError(e);
+    sentry.captureError(e);
   } finally {
-    DogLoading.hide();
+    Loading.hide();
   }
 }
 

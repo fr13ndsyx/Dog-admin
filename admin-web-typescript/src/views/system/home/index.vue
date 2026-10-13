@@ -49,7 +49,7 @@
   import { computed, onActivated, onMounted, ref } from 'vue';
   import { useUserStore } from '/@/store/modules/system/user';
   import { changeLogApi } from '/@/api/support/change-log-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import HomeHelpDoc from '/@/layout/components/side-help-doc/index.vue';
   import FeedbackModal from '/@/layout/components/side-help-doc/components/feedback-modal.vue';
   import heartSentences from './heart-sentence';
@@ -93,7 +93,7 @@
       changeLogs.value = response.data.list;
     } catch (error) {
       loadFailed.value = true;
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
       loading.value = false;
     }

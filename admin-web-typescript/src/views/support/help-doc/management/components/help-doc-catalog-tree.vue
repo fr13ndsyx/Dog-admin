@@ -65,9 +65,9 @@
   import { createVNode, onMounted } from 'vue';
   import HelpDocCatalogFormModal from './help-doc-catalog-form-modal.vue';
   import { helpDocCatalogApi } from '/@/api/support/help-doc-catalog-api';
-  import { DogLoading } from '/@/components/framework/dog-loading';
+  import { Loading } from '/@/components/framework/loading';
   import helpDocCatalogEmitter from '../help-doc-mitt';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
 
   const HELP_DOC_CATALOG_PARENT_ID = 0;
 
@@ -274,7 +274,7 @@
       okText: '删除',
       okType: 'danger',
       async onOk() {
-        DogLoading.show();
+        Loading.show();
         try {
           // 若删除的是当前的目录 先找到上级目录
           let selectedKey = null;
@@ -294,9 +294,9 @@
             selectTree(selectedKey);
           }
         } catch (error) {
-          dogSentry.captureError(error);
+          sentry.captureError(error);
         } finally {
-          DogLoading.hide();
+          Loading.hide();
         }
       },
       cancelText: '取消',

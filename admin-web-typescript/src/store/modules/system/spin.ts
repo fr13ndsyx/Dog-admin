@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { dogSentry } from '/@/lib/dog-sentry';
+import { sentry } from '/@/lib/sentry';
 
 export const useSpinStore = defineStore({
   id: 'spin',
@@ -17,7 +17,7 @@ export const useSpinStore = defineStore({
           spins.style.zIndex = '999';
         }
       } catch (error) {
-        dogSentry.captureError('Spin hide操作失败:', error);
+        sentry.captureError('Spin hide操作失败:', error);
       }
     },
     show() {
@@ -29,7 +29,7 @@ export const useSpinStore = defineStore({
           spins.style.zIndex = '1001';
         }
       } catch (error) {
-        dogSentry.captureError('Spin hide操作失败:', error);
+        sentry.captureError('Spin hide操作失败:', error);
       }
     },
   },

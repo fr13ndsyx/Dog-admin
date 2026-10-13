@@ -1,19 +1,19 @@
 <template>
-  <a-form class="dog-query-form" v-privilege="'support:loginLog:query'" ref="queryFormRef">
-    <a-row class="dog-query-form-row">
-      <a-form-item label="用户名称" class="dog-query-form-item">
+  <a-form class="query-form" v-privilege="'support:loginLog:query'" ref="queryFormRef">
+    <a-row class="query-form-row">
+      <a-form-item label="用户名称" class="query-form-item">
         <a-input style="width: 300px" v-model:value="queryForm.userName" placeholder="用户名称" />
       </a-form-item>
 
-      <a-form-item label="用户IP" class="dog-query-form-item">
+      <a-form-item label="用户IP" class="query-form-item">
         <a-input style="width: 120px" v-model:value="queryForm.ip" placeholder="IP" />
       </a-form-item>
 
-      <a-form-item label="时间" class="dog-query-form-item">
+      <a-form-item label="时间" class="query-form-item">
         <a-range-picker @change="changeCreateDate" v-model:value="createDateRange" :presets="defaultChooseTimeRange" style="width: 240px" />
       </a-form-item>
 
-      <a-form-item class="dog-query-form-item dog-margin-left10">
+      <a-form-item class="query-form-item margin-left10">
         <a-button-group>
           <a-button type="primary" @click="onSearch">
             <template #icon>
@@ -34,7 +34,7 @@
 
   <a-card size="small" :bordered="false" :hoverable="true">
     <a-row justify="end" ref="tableOperatorRef">
-      <TableOperator class="dog-margin-bottom5" v-model="columns" :tableId="TABLE_ID_CONST.SUPPORT.LOGIN_LOG" :refresh="ajaxQuery" />
+      <TableOperator class="margin-bottom5" v-model="columns" :tableId="TABLE_ID_CONST.SUPPORT.LOGIN_LOG" :refresh="ajaxQuery" />
     </a-row>
     <a-table
       size="small"
@@ -64,12 +64,12 @@
         </template>
 
         <template v-if="column.dataIndex === 'userType'">
-          <span>{{ $dogEnumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</span>
+          <span>{{ $enumPlugin.getDescByValue('USER_TYPE_ENUM', text) }}</span>
         </template>
       </template>
     </a-table>
 
-    <div class="dog-query-table-page">
+    <div class="query-table-page">
       <a-pagination
         showSizeChanger
         showQuickJumper
@@ -92,7 +92,7 @@
   import uaparser from 'ua-parser-js';
   import { LOGIN_RESULT_ENUM } from '/@/constants/support/login-log-const';
   import { loginLogApi } from '/@/api/support/login-log-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
   import { calcTableHeight } from '/@/lib/table-auto-height';
@@ -197,7 +197,7 @@
       total.value = responseModel.data.total;
       tableData.value = list;
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       tableLoading.value = false;
     }

@@ -1,7 +1,7 @@
 
-import { DogEnum } from '/@/types/dog-enum';
+import { Enum } from '/@/types/enum';
 
-export const MENU_TYPE_ENUM: DogEnum<number> = {
+export const MENU_TYPE_ENUM: Enum<number> = {
   CATALOG: {
     value: 1,
     desc: '目录',
@@ -19,7 +19,7 @@ export const MENU_TYPE_ENUM: DogEnum<number> = {
 /**
  * 权限类型
  */
-export const MENU_PERMS_TYPE_ENUM: DogEnum<number> = {
+export const MENU_PERMS_TYPE_ENUM: Enum<number> = {
   SA_TOKEN: {
     value: 1,
     desc: 'Sa-Token模式',

@@ -6,14 +6,14 @@ import lodash from 'lodash';
 import JsonViewer from 'vue3-json-viewer';
 import 'vue3-json-viewer/dist/index.css';
 import App from './App.vue';
-import { dogSentry } from '/@/lib/dog-sentry';
+import { sentry } from '/@/lib/sentry';
 import { loginApi } from '/@/api/system/login-api';
 import constantsInfo from '/@/constants/index';
 import { privilegeDirective } from '/@/directives/privilege';
 import i18n from '/@/i18n/index';
 import privilegePlugin from '/@/plugins/privilege-plugin';
 import dictPlugin from '/@/plugins/dict-plugin';
-import dogEnumPlugin from '/@/plugins/dog-enums-plugin';
+import enumPlugin from '/@/plugins/enums-plugin';
 import { buildRoutes, router } from '/@/router';
 import { store } from '/@/store';
 import { useUserStore } from '/@/store/modules/system/user';
@@ -56,7 +56,7 @@ async function getLoginInfo() {
     useUserStore().setUserLoginInfo(res.data);
   } catch (e) {
     message.error(e.data ? e.data.msg : e.message);
-    dogSentry.captureError(e);
+    sentry.captureError(e);
     initVue();
   }
 }
@@ -68,7 +68,7 @@ async function initVue() {
     .use(store)
     .use(i18n)
     .use(Antd)
-    .use(dogEnumPlugin, constantsInfo)
+    .use(enumPlugin, constantsInfo)
     .use(privilegePlugin)
     .use(dictPlugin)
     .use(JsonViewer);

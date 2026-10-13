@@ -1,5 +1,5 @@
 <template>
-  <a-menu :open-keys="openKeys" v-model:selectedKeys="selectedKeys" class="dog-menu" mode="inline" :theme="theme" @openChange="onOpenChange">
+  <a-menu :open-keys="openKeys" v-model:selectedKeys="selectedKeys" class="menu" mode="inline" :theme="theme" @openChange="onOpenChange">
     <template v-for="item in menuTree" :key="item.menuId">
       <template v-if="item.visibleFlag && !item.disabledFlag">
         <template v-if="$lodash.isEmpty(item.children)">
@@ -51,7 +51,7 @@
   }
 
   /**
-   * dogadmin中 router的name 就是 后端存储menu的id
+   * admin中 router的name 就是 后端存储menu的id
    * 所以此处可以直接监听路由，根据路由更新菜单的选中和展开
    */
   function updateOpenKeysAndSelectKeys() {
@@ -106,7 +106,7 @@
 </script>
 
 <style lang="less" scoped>
-  .dog-menu {
+  .menu {
     position: relative;
   }
 </style>

@@ -24,7 +24,7 @@ function runScript(relativePath, imports, globals = {}, source = null) {
 }
 
 const defaults = runScript('src/config/app-config.ts', {}).appDefaultConfig;
-assert.equal(defaults.websiteName, 'dogadmin');
+assert.equal(defaults.websiteName, 'admin');
 assert.equal(Object.hasOwn(defaults, 'footerFlag'), false);
 
 function cachedConfig(value) {
@@ -32,20 +32,20 @@ function cachedConfig(value) {
     pinia: { defineStore: (config) => config },
     '/@/config/app-config': { appDefaultConfig: defaults },
     '/@/constants/local-storage-key-const': { default: { APP_CONFIG: 'app_config' } },
-    '/@/lib/dog-sentry': { dogSentry: { captureError: (error) => { throw error; } } },
+    '/@/lib/sentry': { sentry: { captureError: (error) => { throw error; } } },
     '/@/utils/local-util': { localRead: () => value ? JSON.stringify(value) : null },
   }).useAppConfigStore.state();
 }
 
-const legacy = cachedConfig({ ...defaults, websiteName: 'dogadmin 3.X', footerFlag: true, layout: 'top', sideMenuWidth: 240 });
-assert.equal(legacy.websiteName, 'dogadmin');
+const legacy = cachedConfig({ ...defaults, websiteName: 'admin 3.X', footerFlag: true, layout: 'top', sideMenuWidth: 240 });
+assert.equal(legacy.websiteName, 'admin');
 assert.equal(legacy.layout, 'side');
 assert.equal(legacy.pageTagLocation, 'center');
 assert.equal(legacy.pageTagStyle, 'chrome');
 assert.equal(legacy.sideMenuWidth, 240);
 assert.equal(Object.hasOwn(legacy, 'footerFlag'), false);
 assert.equal(cachedConfig({ ...defaults, websiteName: '客户工作台' }).websiteName, '客户工作台');
-assert.equal(cachedConfig(null).websiteName, 'dogadmin');
+assert.equal(cachedConfig(null).websiteName, 'admin');
 
 const state = { pageTagFlag: true, footerFlag: true };
 const { calcTableHeight } = runScript('src/lib/table-auto-height.ts', {
@@ -73,10 +73,10 @@ for (const filename of vueFiles) {
   const compiled = compileScript(parsed.descriptor, { id: filename });
   const template = compileTemplate({ source: parsed.descriptor.template.content, filename, id: filename, compilerOptions: { bindingMetadata: compiled.bindings } });
   assert.equal(template.errors.length, 0, filename);
-  assert.doesNotMatch(parsed.descriptor.template.content, /logoImg|DogFooter|dog-footer|a-layout-footer|footerFlag|ContactModal|OfficialAccountCard/);
+  assert.doesNotMatch(parsed.descriptor.template.content, /logoImg|Footer|footer|a-layout-footer|footerFlag|ContactModal|OfficialAccountCard/);
 }
 for (const filename of ['.env.development', '.env.localhost', '.env.pre', '.env.production', '.env.test']) {
-  assert.match(fs.readFileSync(path.join(root, filename), 'utf8'), /^VITE_APP_TITLE='dogadmin'\r?$/m);
+  assert.match(fs.readFileSync(path.join(root, filename), 'utf8'), /^VITE_APP_TITLE='admin'\r?$/m);
 }
 assert.match(fs.readFileSync(path.join(root, 'index.html'), 'utf8'), /rel="icon" href="data:,"/);
 

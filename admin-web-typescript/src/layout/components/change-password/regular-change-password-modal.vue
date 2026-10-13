@@ -9,8 +9,8 @@
   import Password from '/@/views/system/account/components/password/index.vue';
   import { useUserStore } from '/@/store/modules/system/user';
   import { loginApi } from '/@/api/system/login-api';
-  import { dogSentry } from '/@/lib/dog-sentry';
-  import { DogLoading } from '/@/components/framework/dog-loading/index';
+  import { sentry } from '/@/lib/sentry';
+  import { Loading } from '/@/components/framework/loading/index';
 
   /**
    * 修改密码弹窗
@@ -24,15 +24,15 @@
    */
   async function refresh() {
     try {
-      DogLoading.show();
+      Loading.show();
       //获取登录用户信息
       const res = await loginApi.getLoginInfo();
       //更新用户信息到pinia
       useUserStore().setUserLoginInfo(res.data);
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 </script>

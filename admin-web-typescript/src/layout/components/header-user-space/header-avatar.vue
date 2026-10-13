@@ -24,7 +24,7 @@
   import { computed } from 'vue';
   import { loginApi } from '/@/api/system/login-api';
   import { useUserStore } from '/@/store/modules/system/user';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { sentry } from '/@/lib/sentry';
   import { useRouter } from 'vue-router';
   import { ACCOUNT_MENU } from '/@/views/system/account/account-menu';
   import { defaultAvatar, showDefaultAvatar } from '/@/lib/avatar';
@@ -34,7 +34,7 @@
     try {
       await loginApi.logout();
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       useUserStore().logout();
       location.reload();

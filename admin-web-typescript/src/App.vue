@@ -41,7 +41,7 @@
   import { useSpinStore } from '/@/store/modules/system/spin';
   import { Popover, theme } from 'ant-design-vue';
   import { themeColors } from '/@/theme/color';
-  import DogCopyIcon from '/@/components/framework/dog-copy-icon/index.vue';
+  import CopyIcon from '/@/components/framework/copy-icon/index.vue';
 
   const antdLocale = computed(() => messages[useAppConfigStore().language].antdLocale);
   const dayjsLocale = computed(() => messages[useAppConfigStore().language].dayjsLocale);
@@ -86,7 +86,7 @@
           content: () =>
             h('div', { style: { display: 'flex' } }, [
               h('div', text),
-              h(DogCopyIcon, { value: document.getElementById(`${column.dataIndex}${index}`).innerText }),
+              h(CopyIcon, { value: document.getElementById(`${column.dataIndex}${index}`).innerText }),
             ]),
         }
       );
@@ -105,13 +105,13 @@
     align-items: flex-start !important;
   }
 
-  .dog-query-form {
+  .query-form {
     background-color: @color-bg-container;
     padding: 5px 10px;
     margin-bottom: 10px;
   }
 
-  .dog-detail-header {
+  .detail-header {
     background-color: @color-bg-container;
     padding: 10px;
   }

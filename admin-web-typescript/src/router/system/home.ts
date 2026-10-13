@@ -1,13 +1,13 @@
 import { HOME_PAGE_NAME } from '/@/constants/system/home-const';
 import { MENU_TYPE_ENUM } from '/@/constants/system/menu-const';
-import DogLayout from '/@/layout/index.vue';
+import Layout from '/@/layout/index.vue';
 
 export const homeRouters:Array<RouteRecordRaw> = [
   {
     path: '/',
     name: '_home',
     redirect: { name: HOME_PAGE_NAME },
-    component: DogLayout,
+    component: Layout,
     meta: {
       title: '首页',
       menuType: MENU_TYPE_ENUM.CATALOG.value,

@@ -1,4 +1,4 @@
-# dogadmin 管理后台底座
+# admin 管理后台底座
 
 基于 Vue 3 与 Spring Boot 3 的前后端分离管理后台，保留账号、组织、角色权限和必要支撑功能，适合在此基础上开发自己的业务系统。
 
@@ -58,11 +58,11 @@ web/
 └── vite.config.ts
 
 api/
-├── dog-admin/
+├── admin/
 │   ├── src/main/java/
 │   ├── src/main/resources/
 │   └── pom.xml
-├── dog-base/
+├── base/
 │   ├── src/main/java/
 │   ├── src/main/resources/
 │   └── pom.xml
@@ -70,13 +70,13 @@ api/
 └── pom.xml
 ```
 
-`dog-admin` 是启动模块，`dog-base` 是它依赖的公共模块。打开后端时导入父工程 `api/pom.xml`。
+`admin` 是启动模块，`base` 是它依赖的公共模块。打开后端时导入父工程 `api/pom.xml`。
 
 两个压缩包是源码包，不包含 `node_modules/`、`dist/`、`target/`、运行日志、上传运行数据、IDE 配置和本机私有连接信息。本 README 单独提供，不放入压缩包。
 
 ## 4. 初始化数据库
 
-1. 启动 MySQL，使用数据库管理工具新建一个空数据库，建议名称为 `dogadmin`。
+1. 启动 MySQL，使用数据库管理工具新建一个空数据库，建议名称为 `admin`。
 2. 字符集选择 `utf8mb4`，排序规则选择 `utf8mb4_general_ci`。
 3. 选中这个新库，执行 `api/mysql/admin.sql`；原源码使用 `mysql/admin.sql`。
 4. 核对导入结果，再配置后端连接这个数据库。
@@ -84,7 +84,7 @@ api/
 创建数据库也可以使用：
 
 ```sql
-CREATE DATABASE dogadmin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE admin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ```
 
 初始化 SQL 在当前选中的数据库执行，不固定数据库名称，不包含删除已有库表的语句。它用于全新安装，不是旧数据库的升级脚本，不要在已有业务数据的库上重复导入。
@@ -109,8 +109,8 @@ CREATE DATABASE dogadmin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 主要配置文件：
 
-- `api/dog-admin/src/main/resources/dev/application.yaml`：应用端口、环境、日志目录。
-- `api/dog-base/src/main/resources/dev/dog-base.yaml`：数据库、Redis、邮件、文件存储和安全支撑配置。
+- `api/admin/src/main/resources/dev/application.yaml`：应用端口、环境、日志目录。
+- `api/base/src/main/resources/dev/base.yaml`：数据库、Redis、邮件、文件存储和安全支撑配置。
 
 原源码中的本机 `dev/test` 配置与压缩包的公共模板不同，不直接转交本机私有配置。使用原源码的公共配置时，可选择已有的 `pre` Maven profile。
 
@@ -118,7 +118,7 @@ CREATE DATABASE dogadmin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 | --- | --- | --- |
 | `MYSQL_HOST` | `127.0.0.1` | MySQL 地址 |
 | `MYSQL_PORT` | `3306` | MySQL 端口 |
-| `MYSQL_DATABASE` | `dogadmin` | 导入 SQL 的数据库名称 |
+| `MYSQL_DATABASE` | `admin` | 导入 SQL 的数据库名称 |
 | `MYSQL_USER` | `root` | MySQL 账号 |
 | `MYSQL_PASSWORD` | 无，必须设置 | MySQL 密码，与 admin 登录密码是两回事 |
 | `REDIS_HOST` | `127.0.0.1` | Redis 地址 |
@@ -137,9 +137,9 @@ CREATE DATABASE dogadmin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 2. 将项目与 Maven 使用的 JDK 设置为 17 或兼容版本。
 3. 重新加载 Maven 工程，等待依赖下载完成；默认选择 `dev` profile。
 4. 设置运行环境变量，工作目录建议选择 `api/`。
-5. 运行启动类 `net.dogadmin.admin.AdminApplication`。
+5. 运行启动类 `net.admin.admin.AdminApplication`。
 
-启动类文件位于 `api/dog-admin/src/main/java/net/dogadmin/admin/AdminApplication.java`。Maven 会按选择的 profile 处理 YAML 资源；切换 profile 后重新处理资源，不能仅修改 Spring 的运行参数代替 Maven profile 切换。
+启动类文件位于 `api/admin/src/main/java/net/admin/admin/AdminApplication.java`。Maven 会按选择的 profile 处理 YAML 资源；切换 profile 后重新处理资源，不能仅修改 Spring 的运行参数代替 Maven profile 切换。
 
 后端默认地址为 `http://127.0.0.1:1024`，Swagger 地址为 `http://127.0.0.1:1024/swagger-ui/index.html`。
 
@@ -149,7 +149,7 @@ CREATE DATABASE dogadmin CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
 ```shell
 mvn -Pdev -DskipTests clean package
-java -jar dog-admin/target/dog-admin-dev-3.0.0.jar
+java -jar admin/target/admin-dev-3.0.0.jar
 ```
 
 这组命令会下载依赖并编译后端。开发阶段优先使用 IDE；本 README 的编写没有执行这些命令。
@@ -176,7 +176,7 @@ npm run localhost
 
 ```dotenv
 NODE_ENV=development
-VITE_APP_TITLE='dogadmin'
+VITE_APP_TITLE='admin'
 VITE_APP_API_URL='http://127.0.0.1:1024'
 ```
 
@@ -228,15 +228,15 @@ VITE_APP_API_URL='http://127.0.0.1:1024'
 
 ## IP 地区数据
 
-后端公共模块的 `dog-base/src/main/resources/ip2region.xdb` 是离线 IP 地区查询数据，由启动监听器加载到内存，供登录和操作日志记录地区使用。它不是 MySQL 初始化脚本，项目改名不修改该文件。
+后端公共模块的 `base/src/main/resources/ip2region.xdb` 是离线 IP 地区查询数据，由启动监听器加载到内存，供登录和操作日志记录地区使用。它不是 MySQL 初始化脚本，项目改名不修改该文件。
 
-当前源码采用 `net.dogadmin` 包名前缀，Maven 模块为 `dog-admin` 和 `dog-base`；公共配置文件为 `dog-base.yaml`，默认数据库名为 `dogadmin`。已有数据库名称不变时，可通过 `MYSQL_DATABASE` 指定原名称。
+当前源码采用 `net.admin` 包名前缀，Maven 模块为 `admin` 和 `base`；公共配置文件为 `base.yaml`，默认数据库名为 `admin`。已有数据库名称不变时，可通过 `MYSQL_DATABASE` 指定原名称。
 
-本轮项目改名已通过离线 Maven 模型校验和 5 项源码回归检查，包括 Java 包路径、Mapper 引用、配置加载、品牌与旧缓存、桌面首页、头像和登录动画；没有执行 Maven 编译、Vite 构建或整套应用启动。可运行检查位于 `admin-web-typescript/tests/test_project_identity.cjs`，安装前端依赖后在前端目录执行 `npm exec -- node tests/test_project_identity.cjs`。
+可运行的源码检查位于 `admin-web-typescript/tests/`，安装前端依赖后在前端目录执行 `node tests/test_project_identity.cjs`（其余检查脚本同理），覆盖 Java 包路径、Mapper 引用、配置加载、品牌与旧缓存、首页、头像、登录动画和传输加密。
 
-## 自定义代码前缀与传输加密
+## 代码命名与传输加密
 
-项目自定义工具类、组件、文件名、导出符号、CSS和生成模板现使用 `Dog`/`dog` 前缀，例如 `DogBeanUtil.java`、`dog-sentry.ts`、`dog-loading/`。引用与调用同步修改，第三方库名称不变。
+项目自定义的工具类、组件、文件名、导出符号和 CSS 类名不带项目前缀，例如 `BeanUtil.java`、`sentry.ts`、`loading/`、`.margin-left10`。与第三方同名时改用描述性名称，例如实现 springdoc `OperationCustomizer` 接口的类叫 `SwaggerOperationCustomizer`；同一文件需要同名第三方类时写全路径。浏览器本地缓存键名前缀为 `admin_`，从旧版升级后需要重新登录一次。
 
 登录密码和修改密码请求使用国密 SM2 非对称加密：私钥只存在后端环境变量 `API_ENCRYPT_PRIVATE_KEY`，后端由私钥推算公钥，前端通过 `GET /login/getEncryptPublicKey` 获取公钥后加密，代码中不再写死任何密钥。原 AES 与 SM4 对称加密实现已移除；响应加密注解 `@ApiEncrypt` 在 SM2 下前端无法解密，目前没有接口使用。数据库中的管理员密码摘要和初始化SQL没有修改。前后端必须使用同一版代码，旧后端配合新前端会导致登录失败。
 
@@ -244,7 +244,7 @@ VITE_APP_API_URL='http://127.0.0.1:1024'
 
 ## 版权与许可
 
-本项目（dogadmin 管理后台底座）基于 **SmartAdmin** 二次开发。
+本项目（admin 管理后台底座）基于 **SmartAdmin** 二次开发。
 
 | 项 | 说明 |
 | --- | --- |

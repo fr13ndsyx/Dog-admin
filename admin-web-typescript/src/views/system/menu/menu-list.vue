@@ -1,20 +1,20 @@
 <template>
   <div>
-    <a-form class="dog-query-form">
-      <a-row class="dog-query-form-row">
-        <a-form-item label="关键字" class="dog-query-form-item">
+    <a-form class="query-form">
+      <a-row class="query-form-row">
+        <a-form-item label="关键字" class="query-form-item">
           <a-input style="width: 300px" v-model:value="queryForm.keywords" placeholder="菜单名称/路由地址/组件路径/权限字符串" />
         </a-form-item>
 
-        <a-form-item label="类型" class="dog-query-form-item">
-          <DogEnumSelect width="120px" v-model:value="queryForm.menuType" placeholder="请选择类型" enum-name="MENU_TYPE_ENUM" />
+        <a-form-item label="类型" class="query-form-item">
+          <EnumSelect width="120px" v-model:value="queryForm.menuType" placeholder="请选择类型" enum-name="MENU_TYPE_ENUM" />
         </a-form-item>
 
-        <a-form-item label="禁用" class="dog-query-form-item">
-          <DogEnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.disabledFlag" />
+        <a-form-item label="禁用" class="query-form-item">
+          <EnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.disabledFlag" />
         </a-form-item>
 
-        <a-form-item class="dog-query-form-item dog-margin-left10">
+        <a-form-item class="query-form-item margin-left10">
           <a-button-group>
             <a-button type="primary" @click="query">
               <template #icon>
@@ -30,7 +30,7 @@
               重置
             </a-button>
           </a-button-group>
-          <a-button class="dog-margin-left20" @click="moreQueryConditionFlag = !moreQueryConditionFlag">
+          <a-button class="margin-left20" @click="moreQueryConditionFlag = !moreQueryConditionFlag">
             <template #icon>
               <MoreOutlined />
             </template>
@@ -39,24 +39,24 @@
         </a-form-item>
       </a-row>
 
-      <a-row class="dog-query-form-row" v-show="moreQueryConditionFlag">
-        <a-form-item label="外链" class="dog-query-form-item">
-          <DogEnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.frameFlag" />
+      <a-row class="query-form-row" v-show="moreQueryConditionFlag">
+        <a-form-item label="外链" class="query-form-item">
+          <EnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.frameFlag" />
         </a-form-item>
 
-        <a-form-item label="缓存" class="dog-query-form-item">
-          <DogEnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.cacheFlag" />
+        <a-form-item label="缓存" class="query-form-item">
+          <EnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.cacheFlag" />
         </a-form-item>
 
-        <a-form-item label="显示" class="dog-query-form-item">
-          <DogEnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.visibleFlag" />
+        <a-form-item label="显示" class="query-form-item">
+          <EnumSelect width="120px" enum-name="FLAG_NUMBER_ENUM" v-model:value="queryForm.visibleFlag" />
         </a-form-item>
       </a-row>
     </a-form>
 
     <a-card size="small" :bordered="false" :hoverable="true">
-      <a-row class="dog-table-btn-block">
-        <div class="dog-table-operate-block">
+      <a-row class="table-btn-block">
+        <div class="table-operate-block">
           <a-button v-privilege="'system:menu:add'" type="primary" @click="showDrawer">
             <template #icon>
               <PlusOutlined />
@@ -71,7 +71,7 @@
             批量删除
           </a-button>
         </div>
-        <div class="dog-table-setting-block">
+        <div class="table-setting-block">
           <TableOperator v-model="columns" :tableId="TABLE_ID_CONST.SYSTEM.MENU" :refresh="query" />
         </div>
       </a-row>
@@ -90,7 +90,7 @@
       >
         <template #bodyCell="{ text, record, column }">
           <template v-if="column.dataIndex === 'menuType'">
-            <a-tag :color="menuTypeColorArray[text]">{{ $dogEnumPlugin.getDescByValue('MENU_TYPE_ENUM', text) }}</a-tag>
+            <a-tag :color="menuTypeColorArray[text]">{{ $enumPlugin.getDescByValue('MENU_TYPE_ENUM', text) }}</a-tag>
           </template>
 
           <template v-if="column.dataIndex === 'component'">
@@ -98,23 +98,23 @@
           </template>
 
           <template v-if="column.dataIndex === 'frameFlag'">
-            <span>{{ $dogEnumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
+            <span>{{ $enumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
           </template>
 
           <template v-if="column.dataIndex === 'permsType'">
-            <span>{{ $dogEnumPlugin.getDescByValue('MENU_PERMS_TYPE_ENUM', text) }}</span>
+            <span>{{ $enumPlugin.getDescByValue('MENU_PERMS_TYPE_ENUM', text) }}</span>
           </template>
 
           <template v-if="column.dataIndex === 'cacheFlag'">
-            <span>{{ $dogEnumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
+            <span>{{ $enumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
           </template>
 
           <template v-if="column.dataIndex === 'visibleFlag'">
-            <span>{{ $dogEnumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
+            <span>{{ $enumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
           </template>
 
           <template v-if="column.dataIndex === 'disabledFlag'">
-            <span>{{ $dogEnumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
+            <span>{{ $enumPlugin.getDescByValue('FLAG_NUMBER_ENUM', text) }}</span>
           </template>
 
           <template v-if="column.dataIndex === 'icon'">
@@ -122,7 +122,7 @@
           </template>
 
           <template v-if="column.dataIndex === 'operate'">
-            <div class="dog-table-operate">
+            <div class="table-operate">
               <a-button
                 v-if="record.menuType !== MENU_TYPE_ENUM.POINTS.value"
                 v-privilege="'system:menu:update'"
@@ -152,9 +152,9 @@
   import { buildMenuTableTree, filterMenuByQueryForm } from './menu-data-handler';
   import { columns } from './menu-list-table-columns';
   import { menuApi } from '/@/api/system/menu-api';
-  import DogEnumSelect from '/@/components/framework/dog-enum-select/index.vue';
-  import { DogLoading } from '/@/components/framework/dog-loading';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import EnumSelect from '/@/components/framework/enum-select/index.vue';
+  import { Loading } from '/@/components/framework/loading';
+  import { sentry } from '/@/lib/sentry';
   import TableOperator from '/@/components/support/table-operator/index.vue';
   import { TABLE_ID_CONST } from '/@/constants/support/table-id-const';
   import { MENU_TYPE_ENUM } from '/@/constants/system/menu-const';
@@ -196,7 +196,7 @@
       // 递归构造树形结构，并付给 TableTree组件
       tableData.value = buildMenuTableTree(filtedMenuList);
     } catch (e) {
-      dogSentry.captureError(e);
+      sentry.captureError(e);
     } finally {
       tableLoading.value = false;
     }
@@ -239,15 +239,15 @@
     });
 
     async function requestBatchDelete(menuIdList) {
-      DogLoading.show();
+      Loading.show();
       try {
         await menuApi.batchDeleteMenu(menuIdList);
         message.success('删除成功!');
         query();
       } catch (e) {
-        dogSentry.captureError(e);
+        sentry.captureError(e);
       } finally {
-        DogLoading.hide();
+        Loading.hide();
       }
     }
   }

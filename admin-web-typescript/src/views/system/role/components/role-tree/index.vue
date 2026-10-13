@@ -15,8 +15,8 @@
   import RoleTreeCheckbox from './role-tree-checkbox.vue';
   import { roleMenuApi } from '/@/api/system/role-menu-api';
   import { useRoleStore } from '/@/store/modules/system/role';
-  import { DogLoading } from '/@/components/framework/dog-loading';
-  import { dogSentry } from '/@/lib/dog-sentry';
+  import { Loading } from '/@/components/framework/loading';
+  import { sentry } from '/@/lib/sentry';
 
   let roleStore = useRoleStore();
   let tree = ref();
@@ -48,14 +48,14 @@
       roleId: selectRoleId.value,
       menuIdList: checkedData,
     };
-    DogLoading.show();
+    Loading.show();
     try {
       await roleMenuApi.updateRoleMenu(params);
       message.success('保存成功');
     } catch (error) {
-      dogSentry.captureError(error);
+      sentry.captureError(error);
     } finally {
-      DogLoading.hide();
+      Loading.hide();
     }
   }
 </script>

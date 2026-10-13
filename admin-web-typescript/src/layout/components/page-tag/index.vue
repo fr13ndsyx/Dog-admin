@@ -1,5 +1,5 @@
 <template>
-  <div id="dogadminPageTag" class="page-tag-div"><ChromeTab /></div>
+  <div id="adminPageTag" class="page-tag-div"><ChromeTab /></div>
 </template>
 <script setup lang="ts">
   import ChromeTab from './components/chrome-tab.vue';
